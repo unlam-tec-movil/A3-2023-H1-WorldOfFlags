@@ -11,4 +11,6 @@
     <string name="hello_second_fragment">Saludo segundo fragment. Arg: %1$s</string>
 
     <string name="cat_image">Imagen Gatito</string>
+    <string name="title_activity_pantalla_principal">PantallaPrincipal</string>
+    <string name="title_activity_pantalla_perfil">PantallaPerfil</string>
 </resources>

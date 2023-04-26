@@ -1,5 +1,6 @@
 package ar.edu.unlam.mobile2.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -21,10 +22,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ui.AppBarConfiguration
-import ar.edu.unlam.mobile2.BuildConfig
 import ar.edu.unlam.mobile2.R
 import ar.edu.unlam.mobile2.databinding.ActivityMainBinding
+import ar.edu.unlam.mobile2.model.CountryModel
 import coil.compose.SubcomposeAsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -34,30 +36,36 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : /*AppCompatActivity()*/ ComponentActivity() {
 
+    private val mainViewModel: CountriesViewModel by viewModels()
+    /*
     private val mainViewModel: MainViewModel by viewModels()
-
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-
+*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        startActivity(Intent(this@MainActivity,PantallaPrincipal::class.java))
+        finish()
+    }
+}
+
+    /*
         Log.i("MainActivity", "onCreate")
 
-        mainViewModel.kittyUrl.observe(
-            this,
-            Observer<String> { _ ->
-                run {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Log.i("MainActivity", "Observer")
-                        setContent {
-                            content(name = "Mundo")
-                        }
-                    }
-                }
-            },
-        )
+        lanzarPaises()
     }
 
+    private fun lanzarPaises() {
+        lifecycleScope.launch {
+            mainViewModel.startGame()
+            CoroutineScope(Dispatchers.Main).launch {
+                setContent{
+                    PantallaJuego(countries = mainViewModel)
+                }
+            }
+        }
+    }
+/*
     override fun onStart() {
         super.onStart()
         Log.i("MainActivity", "onStart")
@@ -106,14 +114,14 @@ class MainActivity : /*AppCompatActivity()*/ ComponentActivity() {
                             Log.e("AsyncImageError", error.result.throwable.message.toString())
                         }
                     },
-                    onLoading = { state ->
+              /*      onLoading = { state ->
                         if (BuildConfig.DEBUG) {
                             Log.i(
                                 "AsyncImageLoading",
                                 state.toString(),
                             )
                         }
-                    },
+                    }, */
 
                     )
             }
@@ -145,4 +153,9 @@ class MainActivity : /*AppCompatActivity()*/ ComponentActivity() {
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }*/
+
+
+ */
+
 }
+*/
