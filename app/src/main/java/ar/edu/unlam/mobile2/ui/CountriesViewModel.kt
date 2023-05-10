@@ -26,6 +26,8 @@ import kotlin.random.Random
 class CountriesViewModel @Inject constructor(private val service: CountriesService) : ViewModel() {
 
 
+
+
     //A partir de la lista de países, agarro dos, uno correcto y uno incorrecto
     val incorrectCountryNameInGame = MutableLiveData<String>()
     val correctCountryFlagInGame = MutableLiveData<String>()
