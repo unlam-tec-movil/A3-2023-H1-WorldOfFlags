@@ -160,7 +160,7 @@ class PantallaJuego : ComponentActivity() {
 	@OptIn(ExperimentalAnimationApi::class)
 	@Composable
 	fun BottomBlock(countries: CountriesViewModel) {
-			when (2) {
+			when (Random.nextInt(from = 1, until = 3)) {
 				1 -> {
 					Box(
 						modifier = Modifier
