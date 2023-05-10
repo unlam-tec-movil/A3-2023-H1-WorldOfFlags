@@ -2,36 +2,12 @@ package ar.edu.unlam.mobile2.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.ui.AppBarConfiguration
-import ar.edu.unlam.mobile2.R
-import ar.edu.unlam.mobile2.databinding.ActivityMainBinding
-import ar.edu.unlam.mobile2.model.CountryModel
-import coil.compose.SubcomposeAsyncImage
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : /*AppCompatActivity()*/ ComponentActivity() {
@@ -44,6 +20,10 @@ class MainActivity : /*AppCompatActivity()*/ ComponentActivity() {
 */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCenter.start(
+            application, "3f8e54d9-dcaf-4b4e-bfd6-bb0527ccf0c1",
+            Analytics::class.java, Crashes::class.java
+        )
         startActivity(Intent(this@MainActivity,PantallaPrincipal::class.java))
         finish()
     }

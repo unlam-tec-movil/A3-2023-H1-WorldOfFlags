@@ -61,16 +61,18 @@ pantallaInicio()
         }
     }
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState",
+        "UnusedMaterialScaffoldPaddingParameter"
+    )
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun pantallaInicio() {
-        //val scaffoldState = rememberScaffoldState()
+        val scaffoldState = rememberScaffoldState()
         //val scaffoldState = rememberUpdatedState(mutableStateOf(false) )
         Scaffold(
 
-         //   scaffoldState = scaffoldState,
-          // topBar = { topBar() },
+            scaffoldState = scaffoldState,
+           topBar = { topBar() },
         ) {
             Column(
                 modifier = Modifier
@@ -78,7 +80,7 @@ pantallaInicio()
                     .background(Color.Black)
             )
             {
-                topBar()
+              //  topBar()
                 imagenLogo()
 
                 Spacer(modifier = Modifier.padding(28.dp))
@@ -114,7 +116,9 @@ pantallaInicio()
                             .background(color = Color(0xFF335ABD)),
                         )
                     {
-                        DropdownMenuItem(onClick = {  },
+                        DropdownMenuItem(onClick = {
+                            startActivity(Intent(this@PantallaPrincipal,PantallaPerfilUsuario::class.java))
+                        },
                             text = {Text(text = "Perfil",
                                 color = Color(0xFF070707)) },
 
