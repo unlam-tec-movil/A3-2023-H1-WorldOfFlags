@@ -1,14 +1,9 @@
 package ar.edu.unlam.mobile2.ui
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
-import android.location.Geocoder
-import android.location.Location
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,27 +27,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import ar.edu.unlam.mobile2.model.MapState
 import ar.edu.unlam.mobile2.ui.ViewModel.MapViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.properties.Delegates
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class PantallaMapa : ComponentActivity() {
@@ -63,6 +52,8 @@ class PantallaMapa : ComponentActivity() {
 			ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
 			if (isGranted){
 				viewModel.getDeviceLocation(fusedLocationClient)
+			} else {
+				viewModel.setShowComposableWithUserLocationIfDeniedPermission()
 			}
 		}
 	
@@ -82,18 +73,19 @@ class PantallaMapa : ComponentActivity() {
 		fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 		askPermission()
 		setContent {
+			val lat = intent.getDoubleExtra("latitude", 0.0)
+			val lon = intent.getDoubleExtra("longitude", 0.0)
 			MapViewScreen(
-				state = viewModel.state.value
+				state = viewModel.state.value,
+				lat = lat,
+				lon = lon
 			)
 		}
 	}
 	
 	@Composable
-	fun MapViewScreen(state: MapState) {
+	fun MapViewScreen(state: MapState, lat: Double, lon: Double) {
 		val context = LocalContext.current
-		val lat = intent.getDoubleExtra("latitude", 0.0)
-		val lon = intent.getDoubleExtra("longitude", 0.0)
-
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
@@ -101,10 +93,9 @@ class PantallaMapa : ComponentActivity() {
 			contentAlignment = Alignment.Center,
 		) {
 			Column(
-				modifier = Modifier
-					.padding(16.dp)
+				modifier = Modifier.fillMaxSize()
 			) {
-				if (state.lastKnowLocation != null){
+				if (state.lastKnowLocation != null && state.showComposableWithUserLocation){
 					MapViewContainerWithUserLocation(state, lat = lat, lon = lon)
 				} else {
 					MapViewContainer(lat, lon)
@@ -122,17 +113,26 @@ class PantallaMapa : ComponentActivity() {
 			}
 		}
 	}
-	
 	@Composable
 	fun MapViewContainer(lat: Double, lon: Double) {
-		val cameraPositionState = rememberCameraPositionState()
-		GoogleMap(
-			modifier = Modifier
-				.fillMaxHeight(0.5f)
-		)
-		LaunchedEffect(Unit){
-			cameraPositionState.centerOnLocation(lat,lon)
+		val marker = LatLng(lat, lon)
+		val cameraPositionState = rememberCameraPositionState{
+			position = CameraPosition.fromLatLngZoom(marker,0f)
 		}
+		Column(
+			modifier = Modifier
+				.fillMaxHeight(0.75f)
+				.fillMaxWidth()
+		){
+			GoogleMap(
+				modifier = Modifier.fillMaxSize(),
+				cameraPositionState = cameraPositionState
+			) {
+				Marker(position = marker)
+				rememberCameraPositionState()
+			}
+		}
+
 	}
 	
 	@Composable
@@ -149,22 +149,17 @@ class PantallaMapa : ComponentActivity() {
 				markerUser.value = LatLng(state.lastKnowLocation.latitude, state.lastKnowLocation.longitude)
 				markerCountry.value = LatLng(lat, lon)
 				
-				val boundsBuilder = LatLngBounds.Builder()
-				boundsBuilder.include(markerCountry.value!!)
-				boundsBuilder.include(markerUser.value!!)
-				val bounds = boundsBuilder.build()
-				
-				val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 0)
-				
-				// Mueve la cámara para mostrar los marcadores dentro de los límites
-				cameraPositionState.animate(
-					update = cameraUpdate
-				)
+				cameraPositionState.centerOnLocation(markerCountry.value!!)
 			}
 		}
+		Column(
+			modifier = Modifier
+				.fillMaxHeight(0.75f) // Mapa ocupa el 75% de la altura
+				.fillMaxWidth()
+		) {
 			GoogleMap(
 				modifier = Modifier
-					.fillMaxHeight(0.5f),
+					.fillMaxSize(),
 				properties = mapProperties,
 				cameraPositionState = cameraPositionState
 			) {
@@ -175,14 +170,16 @@ class PantallaMapa : ComponentActivity() {
 					Marker(position = countryLatLng)
 				}
 			}
+		}
 	}
 	
-	private suspend fun CameraPositionState.centerOnLocation(lat: Double, lon: Double) =
-		animate(
-			update = CameraUpdateFactory.newLatLngZoom(
-				LatLng(lat, lon),
-				0f
+	private suspend fun CameraPositionState.centerOnLocation(latLng: LatLng) =
+		withContext(Dispatchers.Main) {
+			animate(
+				update = CameraUpdateFactory.newLatLngZoom(
+					latLng,
+					0f
+				)
 			)
-		)
-	
+		}
 }
