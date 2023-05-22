@@ -5,7 +5,8 @@ data class CountryModel (
     val flags : FlagsModel,
     val translations: TranslationsModel,
     val region: String,
-    val subregion: String
+    val subregion: String,
+    val latlng: Array<Double>
     ) {
 
     override fun equals(other: Any?): Boolean {

@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -159,6 +160,9 @@ class PantallaJuego : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun BottomBlock(countries: CountriesViewModel) {
+        val intent = Intent(this, PantallaMapa::class.java)
+        intent.putExtra("latitude", countries.latitudeCorrectCountryGame.value)
+        intent.putExtra("longitude", countries.longitudeCorrectCountryGame.value)
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
                 Box(
@@ -176,7 +180,7 @@ class PantallaJuego : ComponentActivity() {
                             Modifier.width(150.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // Boton para el país incorrecto
+                            // Boton para el país correcto
                             Button(
                                 onClick = {
                                     Toast.makeText(
@@ -184,7 +188,7 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    launchCountries()
+                                    startActivity(intent)
                                     Thread.sleep(2000)
                                     buttonIsVisible = true
                                     capitalVisibility = false
@@ -219,7 +223,7 @@ class PantallaJuego : ComponentActivity() {
                             Modifier.width(150.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // Boton para el país correcto
+                            // Boton para el país incorrecto
                             Button(
                                 onClick = {
                                     Toast.makeText(
@@ -319,11 +323,10 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    launchCountries()
+                                    startActivity(intent)
                                     Thread.sleep(1500)
                                     buttonIsVisible = true
                                     capitalVisibility = false
-
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {

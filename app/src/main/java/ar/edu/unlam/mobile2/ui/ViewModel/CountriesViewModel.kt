@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.ui
+package ar.edu.unlam.mobile2.ui.ViewModel
 
 import android.content.Context
 import android.util.Log
@@ -30,6 +30,8 @@ class CountriesViewModel @Inject constructor(private val service: CountriesServi
     val correctCountryFlagInGame = MutableLiveData<String>()
     val correctCountryCapitalInGame = MutableLiveData<String>()
     val correctCountryNameInGame = MutableLiveData<String>()
+    val latitudeCorrectCountryGame = MutableLiveData<Double>()
+    val longitudeCorrectCountryGame = MutableLiveData<Double>()
 
     suspend fun startGame(){
 
@@ -38,6 +40,8 @@ class CountriesViewModel @Inject constructor(private val service: CountriesServi
         correctCountryNameInGame.value = correctCountry?.translations?.spa?.common
         correctCountryFlagInGame.value = correctCountry?.flags?.png
         correctCountryCapitalInGame.value = correctCountry?.capital?.get(0)
+        latitudeCorrectCountryGame.value = correctCountry?.latlng?.get(0)
+        longitudeCorrectCountryGame.value = correctCountry?.latlng?.get(1)
         val incorrectCountry = countriesList?.get(Random.nextInt(0,250))
         if (!incorrectCountry?.equals(correctCountry)!!){
             incorrectCountryNameInGame.value = incorrectCountry.translations.spa.common
