@@ -34,7 +34,12 @@ class CountriesViewModel @Inject constructor(private val service: CountriesServi
     val longitudeCorrectCountryGame = MutableLiveData<Double>()
 
     suspend fun startGame(){
-
+        correctCountryNameInGame.value = "Afganistan"
+        correctCountryCapitalInGame.value = "Caracas"
+        latitudeCorrectCountryGame.value =  34.52813
+        longitudeCorrectCountryGame.value = 69.17233
+        incorrectCountryNameInGame.value = "Argentina"
+/*
         val countriesList = service.getCountry()
         val correctCountry = countriesList?.get(Random.nextInt(0,250))
         correctCountryNameInGame.value = correctCountry?.translations?.spa?.common
@@ -45,7 +50,7 @@ class CountriesViewModel @Inject constructor(private val service: CountriesServi
         val incorrectCountry = countriesList?.get(Random.nextInt(0,250))
         if (!incorrectCountry?.equals(correctCountry)!!){
             incorrectCountryNameInGame.value = incorrectCountry.translations.spa.common
-        }
+        }*/
     }
 
     fun getImageRequest(context: Context): ImageRequest {

@@ -34,6 +34,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -50,6 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
+import ar.edu.unlam.mobile2.movimiento.TiltDirection
 import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,10 +64,12 @@ import kotlin.random.Random
 
 @AndroidEntryPoint
 class PantallaJuego : ComponentActivity() {
-
+    private lateinit var motionDetector: DetectarMovimiento
     private val countriesViewModel: CountriesViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        motionDetector = DetectarMovimiento(this)
+        motionDetector.start()
         launchCountries()
     }
 
@@ -81,6 +87,7 @@ class PantallaJuego : ComponentActivity() {
 
     @Composable
     fun PrincipalScreen(countries: CountriesViewModel) {
+
         Column(
             Modifier
                 .fillMaxSize()
@@ -160,6 +167,7 @@ class PantallaJuego : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun BottomBlock(countries: CountriesViewModel) {
+        val tiltDirection = motionDetector.tiltDirection.collectAsState()
         val intent = Intent(this, PantallaMapa::class.java)
         intent.putExtra("latitude", countries.latitudeCorrectCountryGame.value)
         intent.putExtra("longitude", countries.longitudeCorrectCountryGame.value)
@@ -254,6 +262,39 @@ class PantallaJuego : ComponentActivity() {
                         }
                     }
                 }
+                when (tiltDirection.value) {
+                    TiltDirection.LEFT -> {
+
+                        Toast.makeText(
+                            this@PantallaJuego,
+                            "¡Izquierda Correcto!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        startActivity(intent)
+                        Thread.sleep(2000)
+                        buttonIsVisible = true
+                        capitalVisibility = false
+
+
+                    }
+
+                    TiltDirection.RIGHT -> {
+
+                        Toast.makeText(
+                            this@PantallaJuego,
+                            "¡Derecha InCorrecto!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Thread.sleep(1000)
+                        buttonIsVisible = true
+                        capitalVisibility = false
+
+
+                    }
+
+
+                    else -> {}
+                }
             }
 
             2 -> {
@@ -345,6 +386,38 @@ class PantallaJuego : ComponentActivity() {
                             }
                         }
                     }
+                }
+                when (tiltDirection.value) {
+                    TiltDirection.LEFT -> {
+
+                        Toast.makeText(
+                            this@PantallaJuego,
+                            "¡Izquierda InCorrecto!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Thread.sleep(1000)
+                        buttonIsVisible = true
+                        capitalVisibility = false
+
+                    }
+                    TiltDirection.RIGHT -> {
+
+                        Toast.makeText(
+                            this@PantallaJuego,
+                            "¡Derecha Correcto!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        startActivity(intent)
+                        Thread.sleep(1500)
+                        buttonIsVisible = true
+                        capitalVisibility = false
+
+                    }
+
+                    else -> {
+
+                    }
+
                 }
             }
         }
