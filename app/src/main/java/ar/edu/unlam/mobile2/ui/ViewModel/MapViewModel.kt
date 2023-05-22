@@ -1,6 +1,7 @@
 package ar.edu.unlam.mobile2.ui.ViewModel
 
 import android.annotation.SuppressLint
+import android.location.Location
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,7 +12,8 @@ class MapViewModel: ViewModel() {
 	
 	val state: MutableState<MapState> = mutableStateOf(
 		MapState(
-			lastKnowLocation = null
+			lastKnowLocation = null,
+			showComposableWithUserLocation = true
 		)
 	)
 	@SuppressLint("MissingPermission")
@@ -20,9 +22,16 @@ class MapViewModel: ViewModel() {
 		locationResult.addOnCompleteListener() { task ->
 			if (task.isSuccessful){
 				state.value = state.value.copy(
-					lastKnowLocation = task.result
+					lastKnowLocation = task.result,
+					showComposableWithUserLocation = task.result != null
 				)
 			}
 		}
+	}
+	
+	fun setShowComposableWithUserLocationIfDeniedPermission(){
+		state.value = state.value.copy(
+			showComposableWithUserLocation = false
+		)
 	}
 }
