@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import ar.edu.unlam.mobile2.model.MapState
-import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
 import ar.edu.unlam.mobile2.ui.ViewModel.MapViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -109,7 +107,7 @@ class PantallaMapa : ComponentActivity() {
                 if (state.lastKnowLocation != null && state.showComposableWithUserLocation) {
                     MapViewContainerWithUserLocation(state, lat = lat, lon = lon)
                     Spacer(modifier = Modifier.padding(15.dp))
-                    calculateDistance(lat = lat, lon = lon)
+                    calculateDistance(state, lat = lat, lon = lon)
                 } else {
                     MapViewContainer(lat, lon)
                 }
@@ -128,10 +126,10 @@ class PantallaMapa : ComponentActivity() {
     }
 
     @Composable
-    private fun calculateDistance(lat: Double, lon: Double) {
+    private fun calculateDistance(state: MapState, lat: Double, lon: Double) {
 
-        val lat1 = viewModel.state.value.lastKnowLocation?.latitude
-        val lon1 = viewModel.state.value.lastKnowLocation?.longitude
+        val lat1 = state.lastKnowLocation?.latitude
+        val lon1 = state.lastKnowLocation?.longitude
         val lat2 = lat
         val lon2 = lon
 
