@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 import java.util.EnumMap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.lifecycleScope
+import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
 import coil.compose.rememberAsyncImagePainter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.withContext
@@ -54,7 +55,6 @@ class PantallaQR : ComponentActivity() {
             pantallaInicio(viewModel = viewModel)
         }
     }
-
 
 
     @Throws(WriterException::class)

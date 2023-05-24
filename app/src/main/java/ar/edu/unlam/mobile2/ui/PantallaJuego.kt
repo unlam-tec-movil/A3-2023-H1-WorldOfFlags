@@ -1,6 +1,8 @@
 package ar.edu.unlam.mobile2.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -34,8 +36,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,22 +55,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
+import ar.edu.unlam.mobile2.movimiento.TiltDirection
+import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 @AndroidEntryPoint
 class PantallaJuego : ComponentActivity() {
-
+    private lateinit var motionDetector: DetectarMovimiento
     private val countriesViewModel: CountriesViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        motionDetector = DetectarMovimiento(this)
+        motionDetector.start()
         launchCountries()
     }
-
     private fun launchCountries() {
         lifecycleScope.launch {
             countriesViewModel.startGame()
@@ -77,13 +89,14 @@ class PantallaJuego : ComponentActivity() {
         }
     }
 
-
     @Composable
     fun PrincipalScreen(countries: CountriesViewModel) {
+
         Column(
             Modifier
                 .fillMaxSize()
                 .background(Color.Black)
+                .rotate(0F)
         ) {
             TopBarQR()
             TopBlock(countries)
@@ -97,7 +110,6 @@ class PantallaJuego : ComponentActivity() {
             showCapital(countries)
         }
     }
-
     @Composable
     fun TopBlock(countries: CountriesViewModel) {
         Column(
@@ -156,9 +168,14 @@ class PantallaJuego : ComponentActivity() {
     private var buttonIsVisible by mutableStateOf(true)
     private var capitalVisibility by mutableStateOf(false)
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun BottomBlock(countries: CountriesViewModel) {
+        val tiltDirection = motionDetector.tiltDirection.collectAsState()
+        val intent = Intent(this, PantallaMapa::class.java)
+        intent.putExtra("latitude", countries.latitudeCorrectCountryGame.value)
+        intent.putExtra("longitude", countries.longitudeCorrectCountryGame.value)
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
                 Box(
@@ -176,7 +193,7 @@ class PantallaJuego : ComponentActivity() {
                             Modifier.width(150.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // Boton para el país incorrecto
+                            // Boton para el país correcto
                             Button(
                                 onClick = {
                                     Toast.makeText(
@@ -184,7 +201,7 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    launchCountries()
+                                    startActivity(intent)
                                     Thread.sleep(2000)
                                     buttonIsVisible = true
                                     capitalVisibility = false
@@ -202,6 +219,21 @@ class PantallaJuego : ComponentActivity() {
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                     )
+                                    when (tiltDirection.value) {
+                                        TiltDirection.LEFT -> {
+                                            Toast.makeText(
+                                                this@PantallaJuego,
+                                                "¡Izquierda Correcto!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            Thread.sleep(2000)
+                                            startActivity(intent)
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }
+                                        else -> {
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -219,7 +251,7 @@ class PantallaJuego : ComponentActivity() {
                             Modifier.width(150.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // Boton para el país correcto
+                            // Boton para el país incorrecto
                             Button(
                                 onClick = {
                                     Toast.makeText(
@@ -245,6 +277,22 @@ class PantallaJuego : ComponentActivity() {
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                     )
+                                    when (tiltDirection.value) {
+
+                                        TiltDirection.RIGHT -> {
+                                            Toast.makeText(
+                                                this@PantallaJuego,
+                                                "¡Derecha Incorrecto!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            Thread.sleep(2000)
+                                            launchCountries()
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }
+                                        else -> {
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -294,6 +342,21 @@ class PantallaJuego : ComponentActivity() {
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                     )
+                                    when (tiltDirection.value) {
+                                        TiltDirection.LEFT -> {
+                                            Toast.makeText(
+                                                this@PantallaJuego,
+                                                "¡Izquierda InCorrecto!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            Thread.sleep(2000)
+                                            launchCountries()
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }
+                                        else -> {
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -319,11 +382,10 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    launchCountries()
+                                    startActivity(intent)
                                     Thread.sleep(1500)
                                     buttonIsVisible = true
                                     capitalVisibility = false
-
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
@@ -338,6 +400,21 @@ class PantallaJuego : ComponentActivity() {
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                     )
+                                    when (tiltDirection.value) {
+                                        TiltDirection.RIGHT -> {
+                                            Toast.makeText(
+                                                this@PantallaJuego,
+                                                "¡Derecha Correcto!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            startActivity(intent)
+                                            Thread.sleep(1500)
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }
+                                        else -> {
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -351,7 +428,6 @@ class PantallaJuego : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun showCapital(countries: CountriesViewModel) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -407,7 +483,9 @@ class PantallaJuego : ComponentActivity() {
                         )
                     )
                     finish()
-                }) {
+                }
+                )
+                {
                     Image(
                         painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
                         contentDescription = "icono menu"
