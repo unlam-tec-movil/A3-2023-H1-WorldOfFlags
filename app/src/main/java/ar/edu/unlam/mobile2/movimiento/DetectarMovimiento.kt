@@ -63,9 +63,9 @@ class DetectarMovimiento(context: Context) : SensorEventListener {
     }
 
     companion object {
-        private const val TILT_THRESHOLD = 1.5f
-        private const val TILT_RESET_THRESHOLD =1.5f
-        private const val SHAKE_THRESHOLD = 500
+        private const val TILT_THRESHOLD = 0.5f
+        private const val TILT_RESET_THRESHOLD =0.5f
+        private const val SHAKE_THRESHOLD = 100
     }
 }
 
