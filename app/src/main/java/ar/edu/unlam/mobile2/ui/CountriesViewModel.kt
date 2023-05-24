@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile2.HttpClientModule
 import ar.edu.unlam.mobile2.domain.CountriesService
+import ar.edu.unlam.mobile2.model.CountryModel
 import coil.ImageLoader
 import coil.request.ImageRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,23 +24,21 @@ import kotlin.random.Random
 class CountriesViewModel @Inject constructor(private val service: CountriesService) : ViewModel() {
 
 
-
-
     //A partir de la lista de países, agarro dos, uno correcto y uno incorrecto
     val incorrectCountryNameInGame = MutableLiveData<String>()
     val correctCountryFlagInGame = MutableLiveData<String>()
     val correctCountryCapitalInGame = MutableLiveData<String>()
     val correctCountryNameInGame = MutableLiveData<String>()
 
-    suspend fun startGame(){
+    suspend fun startGame() {
 
         val countriesList = service.getCountry()
-        val correctCountry = countriesList?.get(Random.nextInt(0,250))
+        val correctCountry = countriesList?.get(Random.nextInt(0, 250))
         correctCountryNameInGame.value = correctCountry?.translations?.spa?.common
         correctCountryFlagInGame.value = correctCountry?.flags?.png
         correctCountryCapitalInGame.value = correctCountry?.capital?.get(0)
-        val incorrectCountry = countriesList?.get(Random.nextInt(0,250))
-        if (!incorrectCountry?.equals(correctCountry)!!){
+        val incorrectCountry = countriesList?.get(Random.nextInt(0, 250))
+        if (!incorrectCountry?.equals(correctCountry)!!) {
             incorrectCountryNameInGame.value = incorrectCountry.translations.spa.common
         }
     }
@@ -91,3 +90,4 @@ class CountriesViewModel @Inject constructor(private val service: CountriesServi
         return module.imageLoader(context)
     }
 }
+
