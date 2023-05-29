@@ -78,20 +78,53 @@ class PantallaJuego : ComponentActivity() {
         motionDetector.start()
         launchCountries()
     }
+
     private fun launchCountries() {
         lifecycleScope.launch {
             countriesViewModel.startGame()
             withContext(Dispatchers.Main) {
                 setContent {
-                    PrincipalScreen(countries = countriesViewModel)
+                    val flag = countriesViewModel.correctCountryFlagInGame.value
+                    val correctCountryNameInGame = countriesViewModel.correctCountryNameInGame.value
+                    val incorrectCountryNameInGame =
+                        countriesViewModel.incorrectCountryNameInGame.value
+                    val correctCountryCapitalInGame =
+                        countriesViewModel.correctCountryCapitalInGame.value
+                    val tiltDirection = motionDetector.tiltDirection.collectAsState()
+                    val latitudeCorrectCountryGame =
+                        countriesViewModel.latitudeCorrectCountryGame.value
+                    val longitudeCorrectCountryGame =
+                        countriesViewModel.longitudeCorrectCountryGame.value
+
+
+
+
+                    if (flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
+                        PrincipalScreen(
+                            flag,
+                            correctCountryNameInGame,
+                            incorrectCountryNameInGame,
+                            correctCountryCapitalInGame,
+                            tiltDirection,
+                            latitudeCorrectCountryGame,
+                            longitudeCorrectCountryGame
+                        )
+                    }
                 }
             }
         }
     }
 
     @Composable
-    fun PrincipalScreen(countries: CountriesViewModel) {
-
+    fun PrincipalScreen(
+        flag: String,
+        correctCountryNameInGame: String,
+        incorrectCountryNameInGame: String,
+        correctCountryCapitalInGame: String,
+        tiltDirection: State<TiltDirection>,
+        latitudeCorrectCountryGame: Double,
+        longitudeCorrectCountryGame: Double
+    ) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -99,19 +132,25 @@ class PantallaJuego : ComponentActivity() {
                 .rotate(0F)
         ) {
             TopBarQR()
-            TopBlock(countries)
+            TopBlock(flag)
             Divider(
                 color = Color.DarkGray,
                 thickness = 5.5.dp,
                 modifier = Modifier.padding(top = 25.dp)
             )
-            BottomBlock(countries)
+            BottomBlock(
+                correctCountryNameInGame,
+                incorrectCountryNameInGame,
+                tiltDirection, latitudeCorrectCountryGame,
+                longitudeCorrectCountryGame
+            )
             Spacer(modifier = Modifier.padding(65.dp))
-            showCapital(countries)
+            ShowCapital(correctCountryCapitalInGame)
         }
     }
+
     @Composable
-    fun TopBlock(countries: CountriesViewModel) {
+    fun TopBlock(flag: String) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -155,7 +194,7 @@ class PantallaJuego : ComponentActivity() {
             }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
             AsyncImage(
-                model = countries.correctCountryFlagInGame.value,
+                model = flag,
                 contentDescription = "Bandera",
                 modifier = Modifier
                     .size(300.dp, 170.dp)
@@ -171,11 +210,16 @@ class PantallaJuego : ComponentActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
-    fun BottomBlock(countries: CountriesViewModel) {
-        val tiltDirection = motionDetector.tiltDirection.collectAsState()
+    fun BottomBlock(
+        correctCountryNameInGame: String,
+        incorrectCountryNameInGame: String,
+        tiltDirection: State<TiltDirection>,
+        latitudeCorrectCountryGame: Double,
+        longitudeCorrectCountryGame: Double,
+    ) {
         val intent = Intent(this, PantallaMapa::class.java)
-        intent.putExtra("latitude", countries.latitudeCorrectCountryGame.value)
-        intent.putExtra("longitude", countries.longitudeCorrectCountryGame.value)
+        intent.putExtra("latitude", latitudeCorrectCountryGame)
+        intent.putExtra("longitude", longitudeCorrectCountryGame)
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
                 Box(
@@ -208,31 +252,30 @@ class PantallaJuego : ComponentActivity() {
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
-                                countries.correctCountryNameInGame.value?.let {
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        fontSize = 23.sp,
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    when (tiltDirection.value) {
-                                        TiltDirection.LEFT -> {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "¡Izquierda Correcto!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            Thread.sleep(2000)
-                                            startActivity(intent)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                        }
-                                        else -> {
-                                        }
+                                Text(
+                                    text = correctCountryNameInGame,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    fontSize = 23.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                when (tiltDirection.value) {
+                                    TiltDirection.LEFT -> {
+                                        Toast.makeText(
+                                            this@PantallaJuego,
+                                            "¡Izquierda Correcto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        Thread.sleep(2000)
+                                        startActivity(intent)
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
+                                    }
+
+                                    else -> {
                                     }
                                 }
                             }
@@ -266,32 +309,31 @@ class PantallaJuego : ComponentActivity() {
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
-                                countries.incorrectCountryNameInGame.value?.let {
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        fontSize = 23.sp,
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    when (tiltDirection.value) {
+                                Text(
+                                    text = incorrectCountryNameInGame,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    fontSize = 23.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                when (tiltDirection.value) {
 
-                                        TiltDirection.RIGHT -> {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "¡Derecha Incorrecto!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            Thread.sleep(2000)
-                                            launchCountries()
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                        }
-                                        else -> {
-                                        }
+                                    TiltDirection.RIGHT -> {
+                                        Toast.makeText(
+                                            this@PantallaJuego,
+                                            "¡Derecha Incorrecto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        Thread.sleep(2000)
+                                        launchCountries()
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
+                                    }
+
+                                    else -> {
                                     }
                                 }
                             }
@@ -331,33 +373,33 @@ class PantallaJuego : ComponentActivity() {
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
-                                countries.incorrectCountryNameInGame.value?.let {
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        fontSize = 23.sp,
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    when (tiltDirection.value) {
-                                        TiltDirection.LEFT -> {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "¡Izquierda InCorrecto!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            Thread.sleep(2000)
-                                            launchCountries()
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                        }
-                                        else -> {
-                                        }
+                                Text(
+                                    text = incorrectCountryNameInGame,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    fontSize = 23.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                when (tiltDirection.value) {
+                                    TiltDirection.LEFT -> {
+                                        Toast.makeText(
+                                            this@PantallaJuego,
+                                            "¡Izquierda InCorrecto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        Thread.sleep(2000)
+                                        launchCountries()
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
+                                    }
+
+                                    else -> {
                                     }
                                 }
+
                             }
                         }
                         Divider(
@@ -389,31 +431,30 @@ class PantallaJuego : ComponentActivity() {
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
-                                countries.correctCountryNameInGame.value?.let {
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        fontSize = 23.sp,
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    when (tiltDirection.value) {
-                                        TiltDirection.RIGHT -> {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "¡Derecha Correcto!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            startActivity(intent)
-                                            Thread.sleep(1500)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                        }
-                                        else -> {
-                                        }
+                                Text(
+                                    text = correctCountryNameInGame,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    fontSize = 23.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                when (tiltDirection.value) {
+                                    TiltDirection.RIGHT -> {
+                                        Toast.makeText(
+                                            this@PantallaJuego,
+                                            "¡Derecha Correcto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        startActivity(intent)
+                                        Thread.sleep(1500)
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
+                                    }
+
+                                    else -> {
                                     }
                                 }
                             }
@@ -427,7 +468,7 @@ class PantallaJuego : ComponentActivity() {
 
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
-    fun showCapital(countries: CountriesViewModel) {
+    fun ShowCapital(correctCountryCapitalInGame: String) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -441,14 +482,14 @@ class PantallaJuego : ComponentActivity() {
                     animationSpec = TweenSpec(durationMillis = 500)
                 )
             ) {
-                countries.correctCountryCapitalInGame.value?.let {
-                    Text(
-                        text = it, fontSize = 22.sp,
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.padding(top = 10.dp),
-                        color = Color.White
-                    )
-                }
+                Text(
+                    text = correctCountryCapitalInGame,
+                    fontSize = 22.sp,
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(top = 10.dp),
+                    color = Color.White
+                )
+
             }
             AnimatedVisibility(
                 buttonIsVisible, exit = scaleOut(
@@ -495,7 +536,6 @@ class PantallaJuego : ComponentActivity() {
         )
     }
 }
-
 
 
 

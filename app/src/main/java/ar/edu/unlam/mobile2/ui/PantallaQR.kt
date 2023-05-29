@@ -9,29 +9,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.zxing.BarcodeFormat
-import com.google.zxing.MultiFormatWriter
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.journeyapps.barcodescanner.BarcodeView
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.ImageBitmap
@@ -43,12 +33,19 @@ class PantallaQR : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            pantallaInicio()
+
+            val scaffoldState = rememberScaffoldState()
+
+            val barcodeEncoder = BarcodeEncoder()
+            val bitmap = barcodeEncoder.encodeBitmap("https://www.youtube.com/watch?v=dQw4w9WgXcQ", BarcodeFormat.QR_CODE, 250, 250)
+            val imageBitmap: ImageBitmap = bitmap.asImageBitmap()
+
+            pantallaInicio(scaffoldState, imageBitmap)
         }
     }
 
     @Composable
-    fun QrImage(content: String) {
+    fun QrImage(content: String, imageBitmap: ImageBitmap) {
 
         @Composable
         fun MyText(text: String) {
@@ -59,11 +56,7 @@ class PantallaQR : ComponentActivity() {
                 modifier = Modifier.padding(top = 16.dp)
             )
         }
-        val barcodeEncoder = BarcodeEncoder()
-        val bitmap = barcodeEncoder.encodeBitmap("https://www.youtube.com/watch?v=dQw4w9WgXcQ", BarcodeFormat.QR_CODE, 250, 250)
-
         MaterialTheme {
-            // Use a Surface to add a colored background
             Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
@@ -72,7 +65,7 @@ class PantallaQR : ComponentActivity() {
                     horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
                 ) {
                     // Convert the bitmap to an ImageBitmap
-                    val imageBitmap: ImageBitmap = bitmap.asImageBitmap()
+
 
                     // Add the ImageBitmap to an Image composable
                     androidx.compose.foundation.Image(
@@ -95,10 +88,7 @@ class PantallaQR : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
-    fun pantallaInicio() {
-
-        val scaffoldState = rememberScaffoldState()
-
+    fun pantallaInicio(scaffoldState: ScaffoldState, imageBitmap: ImageBitmap) {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { topBarQR() },
@@ -110,7 +100,7 @@ class PantallaQR : ComponentActivity() {
             )
             {
                 imagenLogo()
-                QrImage(content = "")
+                QrImage(content = "", imageBitmap)
             }
 
         }
@@ -129,6 +119,7 @@ class PantallaQR : ComponentActivity() {
                 .height(350.dp),
         )
     }
+
     @Composable
     fun topBarQR(
     ) {
