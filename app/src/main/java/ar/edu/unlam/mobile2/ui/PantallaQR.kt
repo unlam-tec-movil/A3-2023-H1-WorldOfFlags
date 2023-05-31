@@ -1,17 +1,19 @@
 package ar.edu.unlam.mobile2.ui
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.zxing.BarcodeFormat
@@ -26,102 +28,88 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+
 import ar.edu.unlam.mobile2.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.lifecycle.lifecycleScope
+import ar.edu.unlam.mobile2.ui.ViewModel.PantallaQrViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.withContext
 
 
+@AndroidEntryPoint
 class PantallaQR : ComponentActivity() {
+    private val viewModel: PantallaQrViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-
-            val scaffoldState = rememberScaffoldState()
-
-            val barcodeEncoder = BarcodeEncoder()
-            val bitmap = barcodeEncoder.encodeBitmap("https://www.youtube.com/watch?v=dQw4w9WgXcQ", BarcodeFormat.QR_CODE, 250, 250)
-            val imageBitmap: ImageBitmap = bitmap.asImageBitmap()
-
-            pantallaInicio(scaffoldState, imageBitmap)
-        }
-    }
-
-    @Composable
-    fun QrImage(content: String, imageBitmap: ImageBitmap) {
-
-        @Composable
-        fun MyText(text: String) {
-            Text(
-                text = text,
-                color = Color.White,
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
-        MaterialTheme {
-            Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-                ) {
-                    // Convert the bitmap to an ImageBitmap
-
-
-                    // Add the ImageBitmap to an Image composable
-                    androidx.compose.foundation.Image(
-                        bitmap = imageBitmap,
-                        contentDescription = "",
-                        modifier = Modifier.size(250.dp)
-                    )
-
-                    // Add the text
-                    MyText(text = "Escanea el siguiente QR")
+                setContent {
+                    launchCountries()
                 }
             }
-        }
-    }
 
+       private fun launchCountries() {
+           lifecycleScope.launch {
+               viewModel.StartGameWithQR()
+               withContext(Dispatchers.Main) {
+                   setContent {
+                       PrincipalScreenQR( )
+                   }
+               }
+           }
+       }
 
-
-
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
     @Composable
-    fun pantallaInicio(scaffoldState: ScaffoldState, imageBitmap: ImageBitmap) {
+
+    fun PrincipalScreenQR(  ) {
+        val scaffoldState = rememberScaffoldState()
         Scaffold(
             scaffoldState = scaffoldState,
-            topBar = { topBarQR() },
+            topBar = { TopBarQR() },
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black)
-            )
-            {
-                imagenLogo()
-                QrImage(content = "", imageBitmap)
+            ) {
+                ImagenLogo()
+                Text(
+                    text = "Escanea el siguiente QR",
+                    color = Color.White,
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                QRCode()
             }
-
         }
     }
 
-
-
+    @Composable
+    fun QRCode() {
+        viewModel.qrCodeBitmap.value?.let { QRCode ->
+            Image(
+                bitmap = QRCode, contentDescription = "",
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.FillBounds
+            )
+        }
+    }
 
     @Composable
-    fun imagenLogo() {
+    fun ImagenLogo() {
         Image(
             painter = painterResource(id = R.drawable.mundo),
             contentDescription = "imagen logo",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(350.dp),
+                .height(250.dp),
         )
     }
 
     @Composable
-    fun topBarQR(
+    fun TopBarQR(
     ) {
         var showMenu by remember {
             mutableStateOf(false)
@@ -130,19 +118,30 @@ class PantallaQR : ComponentActivity() {
             title = { Text(text = "QRs", modifier = Modifier, Color.White) },
             backgroundColor = Color.Black,
             actions = {
-                IconButton(onClick = {   startActivity(Intent(this@PantallaQR,
-                    PantallaVersus::class.java))
-                    finish()}) {
-                    Image(painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
-                        contentDescription = "icono menu")
+                IconButton(onClick = {
+                    startActivity(
+                        Intent(
+                            this@PantallaQR,
+                            PantallaVersus::class.java
+                        )
+                    )
+                    finish()
+                }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
+                        contentDescription = "icono menu"
+                    )
                 }
-                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false },
+                DropdownMenu(
+                    expanded = showMenu, onDismissRequest = { showMenu = false },
                     modifier = Modifier
                         .width(110.dp)
-                        .background(color = Color(0xFF335ABD)),)
+                        .background(color = Color(0xFF335ABD)),
+                )
                 {
                 }
             }
         )
     }
 }
+
