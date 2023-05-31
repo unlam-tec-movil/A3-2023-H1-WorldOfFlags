@@ -18,9 +18,6 @@ class MapViewModel: ViewModel() {
 	)
 
 
-
-
-
 	@SuppressLint("MissingPermission")
 	fun getDeviceLocation(fusedLocationProviderClient: FusedLocationProviderClient){
 		val locationResult = fusedLocationProviderClient.lastLocation

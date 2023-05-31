@@ -24,16 +24,16 @@ class PantallaVersus : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            pantallaInicio()
 
+            val scaffoldState = rememberScaffoldState()
+
+            pantallaInicio(scaffoldState)
         }
     }
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-    @Preview
     @Composable
-    fun pantallaInicio() {
-        val scaffoldState = rememberScaffoldState()
+    fun pantallaInicio(scaffoldState: ScaffoldState) {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { topBarVersus() },
