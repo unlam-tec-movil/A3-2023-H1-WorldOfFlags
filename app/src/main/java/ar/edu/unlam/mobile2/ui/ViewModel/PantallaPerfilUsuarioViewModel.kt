@@ -1,32 +1,41 @@
 package ar.edu.unlam.mobile2.ui.ViewModel
 
 
-
 import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ar.edu.unlam.mobile2.model.UsuarioModel
 
 
-class PantallaPerfilUsuarioViewModel: ViewModel() {
+class PantallaPerfilUsuarioViewModel : ViewModel() {
 
 
-    private val _nombre = MutableLiveData<String>()
-    val nombre :LiveData<String> = _nombre
+    val _nombre = MutableLiveData<String>()
+    val nombre: LiveData<String> = _nombre
 
-    private val _email = MutableLiveData<String>()
-    val email :LiveData<String> = _email
-    private val _nacionalidad = MutableLiveData<String>()
-    val nacionalidad :LiveData<String> = _nacionalidad
+    val _email = MutableLiveData<String>()
+    val email: LiveData<String> = _email
 
-    private val _fotoPerfil = MutableLiveData<Bitmap>()
-   val fotoPerfil :LiveData<Bitmap> = _fotoPerfil
-val fotosacadaAhora = mutableStateOf<Bitmap?>(null)
+    val _nacionalidad = MutableLiveData<String>()
+    val nacionalidad: LiveData<String> = _nacionalidad
 
-    fun fotoSacadaCamara(imagenNueva: Bitmap){
+    val _fotoPerfil = MutableLiveData<Bitmap>()
+    val fotoPerfil: LiveData<Bitmap> = _fotoPerfil
+    val fotosacadaAhora = mutableStateOf<Bitmap?>(null)
 
-            _fotoPerfil.value = imagenNueva
+
+    val userName=MutableLiveData<String>()
+    val emailUser=MutableLiveData<String>()
+    val nacionalidadUser=MutableLiveData<String>()
+    val imageUser= MutableLiveData<ImageBitmap?>()
+
+
+    fun fotoSacadaCamara(imagenNueva: Bitmap) {
+
+        _fotoPerfil.value = imagenNueva
         fotosacadaAhora.value = imagenNueva
     }
 
@@ -34,19 +43,21 @@ val fotosacadaAhora = mutableStateOf<Bitmap?>(null)
 
 
 
-fun guardarCambios(nombre:String,email:String,nacionalidad:String){
-    _nombre.postValue(nombre)
-    _email.value = email
- _nacionalidad.value = nacionalidad
-}
+
     fun cambiarNacionalidad(nacionalidad: String) {
-  _nacionalidad.value = nacionalidad
+        _nacionalidad.value = nacionalidad
     }
-     fun cambiarNombre(nombre: String) {
-         _nombre.value = nombre
-     }
+
+    fun cambiarNombre(nombre: String) {
+        _nombre.value = nombre
+    }
+
     fun cambiarEmail(email: String) {
         _email.value = email
     }
+
+
+
+
 
 }

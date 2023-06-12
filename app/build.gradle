@@ -124,6 +124,9 @@ implementation 'androidx.core:core-ktx:1.10.0'
 
     //Location
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+
+    //sharePreferences
+    implementation 'androidx.preference:preference-ktx:1.2.0'
 }
 
 // Allow references to generated code

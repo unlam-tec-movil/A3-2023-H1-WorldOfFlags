@@ -40,13 +40,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,21 +55,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.data.UserRepository
 import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
 import ar.edu.unlam.mobile2.movimiento.TiltDirection
 import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
+import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 @AndroidEntryPoint
+
 class PantallaJuego : ComponentActivity() {
     private lateinit var motionDetector: DetectarMovimiento
     private val countriesViewModel: CountriesViewModel by viewModels()
+    val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -77,6 +82,8 @@ class PantallaJuego : ComponentActivity() {
         motionDetector = DetectarMovimiento(this)
         motionDetector.start()
         launchCountries()
+
+
     }
 
     private fun launchCountries() {
@@ -97,18 +104,30 @@ class PantallaJuego : ComponentActivity() {
                         countriesViewModel.longitudeCorrectCountryGame.value
 
 
+                    //val name =
+                    val user = UserRepository.getUser()
+                    val nameUser = user?.nombre
+                    val nationalityUser = user?.nacionalidad
+                    val imageUser = user?.imagen
 
 
-                    if (flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
+
+
+
+
+                    if (nameUser != null && nationalityUser != null && imageUser != null && flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
                         PrincipalScreen(
+                            nameUser,
+                            nationalityUser,
+                            imageUser,
                             flag,
                             correctCountryNameInGame,
                             incorrectCountryNameInGame,
                             correctCountryCapitalInGame,
                             tiltDirection,
                             latitudeCorrectCountryGame,
-                            longitudeCorrectCountryGame
-                        )
+                            longitudeCorrectCountryGame,
+                            )
                     }
                 }
             }
@@ -117,13 +136,16 @@ class PantallaJuego : ComponentActivity() {
 
     @Composable
     fun PrincipalScreen(
+        nameUser: String,
+        nacionalityUser: String,
+        imageUser: ImageBitmap,
         flag: String,
         correctCountryNameInGame: String,
         incorrectCountryNameInGame: String,
         correctCountryCapitalInGame: String,
         tiltDirection: State<TiltDirection>,
         latitudeCorrectCountryGame: Double,
-        longitudeCorrectCountryGame: Double
+        longitudeCorrectCountryGame: Double,
     ) {
         Column(
             Modifier
@@ -132,7 +154,7 @@ class PantallaJuego : ComponentActivity() {
                 .rotate(0F)
         ) {
             TopBarQR()
-            TopBlock(flag)
+            TopBlock(flag, nameUser,nacionalityUser,imageUser)
             Divider(
                 color = Color.DarkGray,
                 thickness = 5.5.dp,
@@ -150,7 +172,7 @@ class PantallaJuego : ComponentActivity() {
     }
 
     @Composable
-    fun TopBlock(flag: String) {
+    fun TopBlock(flag: String, nameUser: String, nacionalityUser: String, imageUser: ImageBitmap) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,8 +187,10 @@ class PantallaJuego : ComponentActivity() {
                     .background(color = Color(0xFF335ABD))
             )
             {
+
+
                 Image(
-                    painter = painterResource(id = R.drawable.avatar),
+                    bitmap = imageUser,
                     contentDescription = "Foto de perfil del usuario",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -179,8 +203,8 @@ class PantallaJuego : ComponentActivity() {
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.padding(start = 20.dp, top = 7.dp)
                 ) {
-                    Text(text = "Nombre", color = Color.White, fontSize = 17.sp)
-                    Text("Nacionalidad", color = Color.White, fontSize = 17.sp)
+                    Text(text = nameUser, color = Color.White, fontSize = 17.sp)
+                    Text(nacionalityUser, color = Color.White, fontSize = 17.sp)
                 }
                 //----------------------------------------------------------------------------------------------------------------------------------------------
                 Column(

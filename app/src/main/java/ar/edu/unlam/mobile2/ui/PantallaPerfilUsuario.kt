@@ -32,6 +32,7 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
@@ -55,20 +56,24 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.data.UserRepository
+import ar.edu.unlam.mobile2.model.UsuarioModel
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
 
 
 class PantallaPerfilUsuario : ComponentActivity() {
     val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-
             val nombre: String by viewModel.nombre.observeAsState(initial = "")
             val email: String by viewModel.email.observeAsState(initial = "")
             val nacionalidad: String by viewModel.nacionalidad.observeAsState(initial = "")
             val scaffoldState = rememberScaffoldState()
+
+
 
 
             val fotoBitmap: Bitmap? = viewModel.fotosacadaAhora.value
@@ -76,6 +81,247 @@ class PantallaPerfilUsuario : ComponentActivity() {
 
             perfil(nombre, email, nacionalidad, scaffoldState, imagenFoto)
         }
+    }
+
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @Composable
+    fun perfil(
+        nombre: String,
+        email: String,
+        nacionalidad: String,
+        scaffoldState: ScaffoldState,
+        imagenFoto: ImageBitmap?
+    ) {
+        Scaffold(
+            scaffoldState = scaffoldState,
+            topBar = { topBarPerfil() },
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                Spacer(modifier = Modifier.padding(14.dp))
+                nombreRegistro(
+                    Modifier.align(CenterHorizontally),
+                    nombre
+                )
+                //*********************************
+
+                //*********************************
+                Spacer(modifier = Modifier.padding(8.dp))
+                email(Modifier.align(CenterHorizontally), email)
+                //**************************************
+
+                //***************************************
+                Spacer(modifier = Modifier.padding(8.dp))
+                nacionalidad(
+                    Modifier.align(CenterHorizontally),
+                    nacionalidad
+                )
+                //*************************************
+
+                //************************************
+                Spacer(modifier = Modifier.padding(8.dp))
+                tomarFoto(Modifier.align(CenterHorizontally))
+                Spacer(modifier = Modifier.padding(10.dp))
+                fotoPerfil(
+                    imagenFoto,
+                    Modifier
+                        .align(CenterHorizontally)
+                        .clip(CircleShape)
+                )
+                Spacer(modifier = Modifier.padding(10.dp))
+                botonGuardarCambios(
+                    Modifier.align(CenterHorizontally),
+                    nombre,
+                    email,
+                    nacionalidad,
+                    imagenFoto
+                )
+                Text(nombre, color = Color.White)
+                Text(email, color = Color.White)
+                Text(nacionalidad, color = Color.White)
+            }
+
+        }
+    }
+
+
+
+
+    @Composable
+    fun nombreRegistro(modifier: Modifier, nombre: String) {
+
+        TextField(
+            value = nombre, onValueChange = { viewModel._nombre.value = it },
+            modifier = modifier
+                .width(300.dp)
+                .clip(RoundedCornerShape(50.dp)),
+            label = { Text("Nombre") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            singleLine = true,
+
+            maxLines = 1,
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color(0xFF0F0F0F),
+                backgroundColor = Color(0xFF939599)
+            )
+        )
+
+    }
+
+    @Composable
+    fun email(modifier: Modifier, email: String) {
+        TextField(
+            value = email, onValueChange = { viewModel._email.value = it },
+            modifier = modifier
+                .width(300.dp)
+                .clip(RoundedCornerShape(50.dp)),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            label = { Text("Email") },
+            singleLine = true,
+            maxLines = 1,
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color(0xFF0F0F0F),
+                backgroundColor = Color(0xFF939599)
+            )
+        )
+    }
+
+    @Composable
+    fun nacionalidad(
+        modifier: Modifier,
+        nacionalidad: String,
+
+        ) {
+        TextField(
+            value = nacionalidad, onValueChange = { viewModel._nacionalidad.value = it },
+            modifier = modifier
+                .width(300.dp)
+                .clip(RoundedCornerShape(50.dp)),
+            label = { Text("Pais") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            singleLine = true,
+            maxLines = 1,
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color(0xFF0F0F0F),
+                backgroundColor = Color(0xFF939599)
+            )
+        )
+    }
+
+    @Composable
+    fun tomarFoto(modifier: Modifier) {
+        Button(modifier = modifier
+            .height(60.dp)
+            .width(300.dp),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF939599)),
+            onClick = {
+                pedirPermisoCamara()
+            }) {
+            androidx.compose.material.Text(text = "Foto perfil (Presione aquí)")
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    fun fotoPerfil(imagenFoto: ImageBitmap?, modifier: Modifier) {
+
+        Box(
+            modifier = modifier
+                .height(250.dp)
+                .width(250.dp)
+        ) {
+            if (imagenFoto != null) {
+
+                Image(
+                    bitmap = imagenFoto, contentDescription = "",
+                    modifier = modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.avatar), contentDescription = "",
+                    modifier = modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun botonGuardarCambios(
+        modifier: Modifier,
+        nombre: String,
+        email: String,
+        nacionalidad: String,
+        imagenFoto: ImageBitmap?
+    ) {
+        Button(modifier = modifier
+            .height(50.dp)
+            .width(200.dp),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
+            onClick = {
+                val user= UsuarioModel(nombre,email,nacionalidad, imagenFoto!!)
+                UserRepository.setUser(user)
+              //  viewModel.saveUser(nombre, email, nacionalidad, imagenFoto)
+                Toast.makeText(
+                    this,
+                    "Cambios guardados Correctamente",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        ) {
+            androidx.compose.material.Text(text = "Guardar Cambios")
+        }
+    }
+
+    @Composable
+    fun topBarPerfil(
+    ) {
+        var showMenu by remember {
+            mutableStateOf(false)
+        }
+        TopAppBar(
+            title = {
+                androidx.compose.material.Text(
+                    text = "Mi Perfil",
+                    modifier = Modifier,
+                    Color.White,
+                )
+            },
+            backgroundColor = Color.Black,
+            actions = {
+                IconButton(onClick = {
+                    startActivity(
+                        Intent(
+                            this@PantallaPerfilUsuario,
+                            MainActivity::class.java
+                        )
+                    )
+                    finish()
+                }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
+                        contentDescription = "icono menu"
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMenu, onDismissRequest = { showMenu = false },
+                    modifier = Modifier
+                        .width(110.dp)
+                        .background(color = Color(0xFF335ABD)),
+                )
+                {
+                }
+            }
+        )
     }
 
     val CAMERA_REQUEST_CODE = 0
@@ -163,213 +409,6 @@ class PantallaPerfilUsuario : ComponentActivity() {
 
     }
 
-
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-    @Composable
-    fun perfil(
-        nombre: String,
-        email: String,
-        nacionalidad: String,
-        scaffoldState: ScaffoldState,
-        imagenFoto: ImageBitmap?
-    ) {
-        Scaffold(
-            scaffoldState = scaffoldState,
-            topBar = { topBarPerfil() },
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-            ) {
-                Spacer(modifier = Modifier.padding(14.dp))
-                nombreRegistro(
-                    Modifier.align(CenterHorizontally),
-                    nombre
-                ) { viewModel.cambiarNombre(it) }
-                Spacer(modifier = Modifier.padding(8.dp))
-                email(Modifier.align(CenterHorizontally), email) { viewModel.cambiarEmail(it) }
-                Spacer(modifier = Modifier.padding(8.dp))
-                nacionalidad(
-                    Modifier.align(CenterHorizontally),
-                    nacionalidad
-                ) { viewModel.cambiarNacionalidad(it) }
-                Spacer(modifier = Modifier.padding(8.dp))
-                tomarFoto(Modifier.align(CenterHorizontally))
-                Spacer(modifier = Modifier.padding(10.dp))
-                fotoPerfil(
-                    imagenFoto,
-                    Modifier
-                        .align(CenterHorizontally)
-                        .clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.padding(10.dp))
-                botonGuardarCambios(Modifier.align(CenterHorizontally)) {
-                    viewModel.guardarCambios(
-                        nombre,
-                        email,
-                        nacionalidad
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun nombreRegistro(modifier: Modifier, nombre: String, cambiarNombre: (String) -> Unit) {
-        TextField(
-            value = nombre, onValueChange = { cambiarNombre(it) },
-            modifier = modifier
-                .width(300.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            placeholder = { androidx.compose.material.Text(text = "Nombre") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
-            maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF0F0F0F),
-                backgroundColor = Color(0xFF939599)
-            )
-        )
-    }
-
-    @Composable
-    fun email(modifier: Modifier, email: String, cambiarNombre: (String) -> Unit) {
-        TextField(
-            value = email, onValueChange = { cambiarNombre(it) },
-            modifier = modifier
-                .width(300.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            placeholder = { androidx.compose.material.Text(text = "Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true,
-            maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF0F0F0F),
-                backgroundColor = Color(0xFF939599)
-            )
-        )
-    }
-
-    @Composable
-    fun nacionalidad(
-        modifier: Modifier,
-        nacionalidad: String,
-        onTextFieldChanged: (String) -> Unit
-    ) {
-        TextField(
-            value = nacionalidad, onValueChange = { onTextFieldChanged(it) },
-            modifier = modifier
-                .width(300.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            placeholder = { androidx.compose.material.Text(text = "Pais") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
-            maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF0F0F0F),
-                backgroundColor = Color(0xFF939599)
-            )
-        )
-    }
-
-    @Composable
-    fun tomarFoto(modifier: Modifier) {
-        Button(modifier = modifier
-            .height(60.dp)
-            .width(300.dp),
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF939599)),
-            onClick = {
-                pedirPermisoCamara()
-            }) {
-            androidx.compose.material.Text(text = "Foto perfil (Presione aquí)")
-        }
-    }
-
-    @SuppressLint("UnrememberedMutableState")
-    @Composable
-    fun fotoPerfil(imagenFoto: ImageBitmap?, modifier: Modifier) {
-
-        Box(
-            modifier = modifier
-                .height(250.dp)
-                .width(250.dp)
-        ) {
-            if (imagenFoto != null) {
-
-                Image(
-                    bitmap = imagenFoto, contentDescription = "",
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.avatar), contentDescription = "",
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()
-                )
-            }
-        }
-    }
-
-    @Composable
-    fun botonGuardarCambios(modifier: Modifier, cambiarNombre: (String) -> Unit) {
-        Button(modifier = modifier
-            .height(50.dp)
-            .width(200.dp),
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
-            onClick = {
-            }) {
-            androidx.compose.material.Text(text = "Guardar Cambios")
-        }
-    }
-
-    @Composable
-    fun topBarPerfil(
-    ) {
-        var showMenu by remember {
-            mutableStateOf(false)
-        }
-        TopAppBar(
-            title = {
-                androidx.compose.material.Text(
-                    text = "Mi Perfil",
-                    modifier = Modifier,
-                    Color.White,
-                )
-            },
-            backgroundColor = Color.Black,
-            actions = {
-                IconButton(onClick = {
-                    startActivity(
-                        Intent(
-                            this@PantallaPerfilUsuario,
-                            MainActivity::class.java
-                        )
-                    )
-                    finish()
-                }) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
-                        contentDescription = "icono menu"
-                    )
-                }
-                DropdownMenu(
-                    expanded = showMenu, onDismissRequest = { showMenu = false },
-                    modifier = Modifier
-                        .width(110.dp)
-                        .background(color = Color(0xFF335ABD)),
-                )
-                {
-                }
-            }
-        )
-    }
 }
 
 
