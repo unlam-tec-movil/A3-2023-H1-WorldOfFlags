@@ -91,6 +91,7 @@ class PantallaMapa : ComponentActivity() {
 
             val lat = intent.getDoubleExtra("latitude", 0.0)
             val lon = intent.getDoubleExtra("longitude", 0.0)
+            val vidas = intent.getIntExtra("vidas", 5)
             val marker = LatLng(lat, lon)
 
             MapViewScreen(
@@ -100,7 +101,8 @@ class PantallaMapa : ComponentActivity() {
                 showComposableWithUserLocation,
                 context,
                 marker,
-                cameraPositionState
+                cameraPositionState,
+                vidas
             )
         }
     }
@@ -113,9 +115,11 @@ class PantallaMapa : ComponentActivity() {
         showComposableWithUserLocation: Boolean,
         context: Context,
         marker: LatLng,
-        cameraPositionState: CameraPositionState
+        cameraPositionState: CameraPositionState,
+        vidas: Int
     ) {
-
+        val intent = Intent(this, PantallaJuego::class.java)
+        intent.putExtra("vidas", vidas)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -137,7 +141,7 @@ class PantallaMapa : ComponentActivity() {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        context.startActivity(Intent(context, PantallaJuego::class.java))
+                        startActivity(intent)
                     }
                 ) {
                     Text(text = "Siguiente")
