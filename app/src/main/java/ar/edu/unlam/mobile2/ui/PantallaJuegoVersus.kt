@@ -4,15 +4,14 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
@@ -52,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -61,114 +59,98 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
-import ar.edu.unlam.mobile2.data.UserRepository
 import ar.edu.unlam.mobile2.model.CountryModel
+import ar.edu.unlam.mobile2.model.DatosJuego
 import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
 import ar.edu.unlam.mobile2.movimiento.TiltDirection
 import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
-import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
-import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.properties.Delegates
 import kotlin.random.Random
 
 @AndroidEntryPoint
-class PantallaJuego : ComponentActivity() {
+class PantallaJuegoVersus : ComponentActivity() {
+    
     private lateinit var motionDetector: DetectarMovimiento
+    private lateinit var countriesQR: List<CountryModel>
     private val countriesViewModel: CountriesViewModel by viewModels()
-    private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
-    private val userViewModel: UserViewModel by viewModels()
-
-
-
-    private var vidas: Int = 0
-  
+    private var countryIndex: Int = 0
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    
-        vidas = intent.getIntExtra("vidas", 5)
-        
+
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         motionDetector = DetectarMovimiento(this)
         motionDetector.start()
-        launchCountries()
-
-
-    }
-
-    @SuppressLint("CoroutineCreationDuringComposition")
-    private fun launchCountries() {
-        val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-            .setView(R.layout.layout_loading)
-            .setCancelable(false)
-            .create()
-        progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
-        progressDialog.show()
+        countryIndex = intent.getIntExtra("index", 0)
+        countriesQR = DatosJuego.listaPaises
         
-        lifecycleScope.launch {
-            countriesViewModel.startGame()
-            withContext(Dispatchers.Main) {
-                progressDialog.dismiss()
-                
-                setContent {
-                    val flag = countriesViewModel.correctCountryFlagInGame.value
-                    val correctCountryNameInGame = countriesViewModel.correctCountryNameInGame.value
-                    val incorrectCountryNameInGame =
-                        countriesViewModel.incorrectCountryNameInGame.value
-                    val correctCountryCapitalInGame =
-                        countriesViewModel.correctCountryCapitalInGame.value
-                    val tiltDirection = motionDetector.tiltDirection.collectAsState()
-                    val latitudeCorrectCountryGame =
-                        countriesViewModel.latitudeCorrectCountryGame.value
-                    val longitudeCorrectCountryGame =
-                        countriesViewModel.longitudeCorrectCountryGame.value
-
-
-                    userViewModel.getUserDatabase()
-
-
-                    val nameUser = userViewModel.userName.value
-                    val nationalityUser = userViewModel.nacionalityUser.value
-                    val imagenUser = userViewModel.imageUser.value
-
-
-
-                    if (nameUser != null && nationalityUser != null && flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
-
-                    
-                        PrincipalScreen(
-                            nameUser,
-                            nationalityUser,
-                            imagenUser,
-                            flag,
-                            correctCountryNameInGame,
-                            incorrectCountryNameInGame,
-                            correctCountryCapitalInGame,
-                            tiltDirection,
-                            latitudeCorrectCountryGame,
-                            longitudeCorrectCountryGame,
-                        )
+        launchCountries()
+    }
+    
+    private fun launchCountries(){
+        
+        if (countryIndex != countriesQR.size) {
+            val progressDialog = AlertDialog.Builder(this@PantallaJuegoVersus)
+                .setView(R.layout.layout_loading)
+                .setCancelable(false)
+                .create()
+            progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+            progressDialog.show()
+            val country = countriesQR[countryIndex]
+            lifecycleScope.launch {
+                countriesViewModel.startGameQR(country, countriesQR as MutableList<CountryModel>)
+                countryIndex += 1
+                withContext(Dispatchers.Main){
+                    progressDialog.dismiss()
+                    setContent {
+                        val flag = countriesViewModel.correctCountryFlagInGame.value
+                        val correctCountryNameInGame = countriesViewModel.correctCountryNameInGame.value
+                        val incorrectCountryNameInGame = countriesViewModel.incorrectCountryNameInGame.value
+                        val correctCountryCapitalInGame = countriesViewModel.correctCountryCapitalInGame.value
+                        val tiltDirection = motionDetector.tiltDirection.collectAsState()
+                        val latitudeCorrectCountryGame = countriesViewModel.latitudeCorrectCountryGame.value
+                        val longitudeCorrectCountryGame = countriesViewModel.longitudeCorrectCountryGame.value
+        
+                        if (flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
+                            PrincipalScreen(
+                                flag,
+                                correctCountryNameInGame,
+                                incorrectCountryNameInGame,
+                                correctCountryCapitalInGame,
+                                tiltDirection,
+                                latitudeCorrectCountryGame,
+                                longitudeCorrectCountryGame
+                            )
+                        }
                     }
                 }
             }
+        } else {
+            Toast.makeText(
+                this@PantallaJuegoVersus,
+                "Game Over",
+                Toast.LENGTH_SHORT
+            ).show()
+            Thread.sleep(1500)
+            startActivity(Intent(this@PantallaJuegoVersus, PantallaPrincipal::class.java))
         }
     }
 
     @Composable
     fun PrincipalScreen(
-        nameUser: String,
-        nacionalityUser: String,
-        imageUser: ByteArray?,
         flag: String,
         correctCountryNameInGame: String,
         incorrectCountryNameInGame: String,
         correctCountryCapitalInGame: String,
         tiltDirection: State<TiltDirection>,
         latitudeCorrectCountryGame: Double,
-        longitudeCorrectCountryGame: Double,
+        longitudeCorrectCountryGame: Double
     ) {
         Column(
             Modifier
@@ -177,7 +159,7 @@ class PantallaJuego : ComponentActivity() {
                 .rotate(0F)
         ) {
             TopBarQR()
-            TopBlock(flag, nameUser, nacionalityUser, imageUser)
+            TopBlock(flag)
             Divider(
                 color = Color.DarkGray,
                 thickness = 5.5.dp,
@@ -194,9 +176,8 @@ class PantallaJuego : ComponentActivity() {
         }
     }
 
-    @SuppressLint("RememberReturnType")
     @Composable
-    fun TopBlock(flag: String, nameUser: String, nacionalityUser: String, imageUser: ByteArray?) {
+    fun TopBlock(flag: String) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -211,35 +192,22 @@ class PantallaJuego : ComponentActivity() {
                     .background(color = Color(0xFF335ABD))
             )
             {
-
-                val bitmap = remember {
-                    imageUser?.let {
-                        BitmapFactory.decodeByteArray(
-                            imageUser, 0,
-                            it.size
-                        )
-                    }
-                }
-                val imageBitmap = remember { bitmap?.asImageBitmap() }
-
-                if (imageBitmap != null) {
-                    Image(
-                        bitmap = imageBitmap,
-                        contentDescription = "Foto de perfil del usuario",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .padding(start = 14.dp, top = 5.dp, bottom = 5.dp)
-                            .size(57.dp)
-                            .clip(CircleShape)
-                    )
-                }
+                Image(
+                    painter = painterResource(id = R.drawable.avatar),
+                    contentDescription = "Foto de perfil del usuario",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(start = 14.dp, top = 5.dp, bottom = 5.dp)
+                        .size(57.dp)
+                        .clip(CircleShape)
+                )
                 //-------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.padding(start = 20.dp, top = 7.dp)
                 ) {
-                    Text(text = nameUser, color = Color.White, fontSize = 17.sp)
-                    Text(nacionalityUser, color = Color.White, fontSize = 17.sp)
+                    Text(text = "Nombre", color = Color.White, fontSize = 17.sp)
+                    Text("Nacionalidad", color = Color.White, fontSize = 17.sp)
                 }
                 //----------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
@@ -247,7 +215,7 @@ class PantallaJuego : ComponentActivity() {
                     modifier = Modifier.padding(start = 60.dp, top = 7.dp)
                 ) {
                     Text(text = "Puntos : 0", color = Color.White, fontSize = 17.sp)
-                    Text("Vidas : $vidas", color = Color.White, fontSize = 17.sp)
+                    Text("Vidas : 5", color = Color.White, fontSize = 17.sp)
                 }
                 //----------------------------------------------------------------------------------------------------------------------------------------------
             }
@@ -274,12 +242,13 @@ class PantallaJuego : ComponentActivity() {
         incorrectCountryNameInGame: String,
         tiltDirection: State<TiltDirection>,
         latitudeCorrectCountryGame: Double,
-        longitudeCorrectCountryGame: Double
+        longitudeCorrectCountryGame: Double,
     ) {
         val intent = Intent(this, PantallaMapa::class.java)
         intent.putExtra("latitude", latitudeCorrectCountryGame)
         intent.putExtra("longitude", longitudeCorrectCountryGame)
-        intent.putExtra("vidas", vidas)
+        intent.putExtra("versus", true)
+        intent.putExtra("index", countryIndex)
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
                 Box(
@@ -301,23 +270,14 @@ class PantallaJuego : ComponentActivity() {
                             Button(
                                 onClick = {
                                     Toast.makeText(
-                                        this@PantallaJuego,
+                                        this@PantallaJuegoVersus,
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-                                        .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
-                                        .setCancelable(false)
-                                        .create()
-                                    progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
-                                    progressDialog.show()
-            
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        progressDialog.dismiss()
-                                        startActivity(intent)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                    }, 2000)
+                                    startActivity(intent)
+                                    Thread.sleep(2000)
+                                    buttonIsVisible = true
+                                    capitalVisibility = false
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
@@ -334,25 +294,14 @@ class PantallaJuego : ComponentActivity() {
                                 when (tiltDirection.value) {
                                     TiltDirection.LEFT -> {
                                         Toast.makeText(
-                                            this@PantallaJuego,
-                                            "¡Correcto!",
+                                            this@PantallaJuegoVersus,
+                                            "¡Izquierda Correcto!",
                                             Toast.LENGTH_SHORT
                                         ).show()
-    
-                                        val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-                                            .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
-                                            .setCancelable(false)
-                                            .create()
-                                        progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
-                                        progressDialog.show()
-    
-                                        Handler(Looper.getMainLooper()).postDelayed({
-                                            progressDialog.dismiss()
-        
-                                            startActivity(intent)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                        }, 2000)
+                                        Thread.sleep(2000)
+                                        startActivity(intent)
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
                                     }
 
                                     else -> {
@@ -377,26 +326,15 @@ class PantallaJuego : ComponentActivity() {
                             // Boton para el país incorrecto
                             Button(
                                 onClick = {
-                                    if (vidas > 1) {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Incorrecto :(",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        launchCountries()
-                                        Thread.sleep(1500)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                        this@PantallaJuego.vidas -= 1
-                                    } else {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Game Over",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        Thread.sleep(1500)
-                                        startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
-                                    }
+                                    Toast.makeText(
+                                        this@PantallaJuegoVersus,
+                                        "Incorrecto :(",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    launchCountries()
+                                    Thread.sleep(1500)
+                                    buttonIsVisible = true
+                                    capitalVisibility = false
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
@@ -413,26 +351,15 @@ class PantallaJuego : ComponentActivity() {
                                 when (tiltDirection.value) {
 
                                     TiltDirection.RIGHT -> {
-                                        if (vidas > 0) {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Incorrecto :(",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            launchCountries()
-                                            Thread.sleep(1500)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                            this@PantallaJuego.vidas -= 1
-                                        } else {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Game Over",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            Thread.sleep(1500)
-                                            startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
-                                        }
+                                        Toast.makeText(
+                                            this@PantallaJuegoVersus,
+                                            "¡Derecha Incorrecto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        Thread.sleep(2000)
+                                        launchCountries()
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
                                     }
 
                                     else -> {
@@ -463,26 +390,15 @@ class PantallaJuego : ComponentActivity() {
                             // Boton para el país incorrecto
                             Button(
                                 onClick = {
-                                    if (vidas > 0) {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Incorrecto :(",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        launchCountries()
-                                        Thread.sleep(1500)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                        this@PantallaJuego.vidas -= 1
-                                    } else {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Game Over",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        Thread.sleep(1500)
-                                        startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
-                                    }
+                                    Toast.makeText(
+                                        this@PantallaJuegoVersus,
+                                        "Incorrecto :(",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    launchCountries()
+                                    Thread.sleep(1500)
+                                    buttonIsVisible = true
+                                    capitalVisibility = false
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
@@ -498,26 +414,15 @@ class PantallaJuego : ComponentActivity() {
                                 )
                                 when (tiltDirection.value) {
                                     TiltDirection.LEFT -> {
-                                        if (vidas > 0) {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Incorrecto :(",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            launchCountries()
-                                            Thread.sleep(1500)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                            this@PantallaJuego.vidas -= 1
-                                        } else {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Game Over",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            Thread.sleep(1500)
-                                            startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
-                                        }
+                                        Toast.makeText(
+                                            this@PantallaJuegoVersus,
+                                            "¡Izquierda InCorrecto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        Thread.sleep(2000)
+                                        launchCountries()
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
                                     }
 
                                     else -> {
@@ -544,24 +449,14 @@ class PantallaJuego : ComponentActivity() {
                             Button(
                                 onClick = {
                                     Toast.makeText(
-                                        this@PantallaJuego,
+                                        this@PantallaJuegoVersus,
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-    
-                                    val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-                                        .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
-                                        .setCancelable(false)
-                                        .create()
-                                    progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
-                                    progressDialog.show()
-    
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        progressDialog.dismiss()
-                                        startActivity(intent)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                    }, 2000)
+                                    startActivity(intent)
+                                    Thread.sleep(1500)
+                                    buttonIsVisible = true
+                                    capitalVisibility = false
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
@@ -578,24 +473,14 @@ class PantallaJuego : ComponentActivity() {
                                 when (tiltDirection.value) {
                                     TiltDirection.RIGHT -> {
                                         Toast.makeText(
-                                            this@PantallaJuego,
-                                            "¡Correcto!",
+                                            this@PantallaJuegoVersus,
+                                            "¡Derecha Correcto!",
                                             Toast.LENGTH_SHORT
                                         ).show()
-    
-                                        val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-                                            .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
-                                            .setCancelable(false)
-                                            .create()
-                                        progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
-                                        progressDialog.show()
-    
-                                        Handler(Looper.getMainLooper()).postDelayed({
-                                            progressDialog.dismiss()
-                                            startActivity(intent)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                        }, 2000)
+                                        startActivity(intent)
+                                        Thread.sleep(1500)
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
                                     }
 
                                     else -> {
@@ -663,7 +548,7 @@ class PantallaJuego : ComponentActivity() {
                 IconButton(onClick = {
                     startActivity(
                         Intent(
-                            this@PantallaJuego,
+                            this@PantallaJuegoVersus,
                             MainActivity::class.java
                         )
                     )
