@@ -4,6 +4,7 @@ package ar.edu.unlam.mobile2.ui.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ar.edu.unlam.mobile2.domain.CountriesService
+import ar.edu.unlam.mobile2.model.CountryModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.random.Random
@@ -37,5 +38,18 @@ class CountriesViewModel @Inject constructor(private val service: CountriesServi
                 }
             }
         }
+    
+    suspend fun startGameQR(country: CountryModel, countriesList: MutableList<CountryModel>){
+        var incorrectCountry: CountryModel
+        correctCountryNameInGame.value = country.translations.spa.common
+        correctCountryFlagInGame.value = country.flags.png
+        correctCountryCapitalInGame.value = country.capital[0]
+        latitudeCorrectCountryGame.value = country.latlng[0]
+        longitudeCorrectCountryGame.value = country.latlng[1]
+        do {
+            incorrectCountry = service.getCountry()?.get(Random.nextInt(0, 250))!!
+            incorrectCountryNameInGame.value = incorrectCountry.translations.spa.common
+        } while (incorrectCountry == country)
     }
+}
 

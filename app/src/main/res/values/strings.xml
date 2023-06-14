@@ -14,4 +14,6 @@
     <string name="title_activity_pantalla_principal">PantallaPrincipal</string>
     <string name="title_activity_pantalla_perfil">PantallaPerfil</string>
     <string name="title_activity_pantalla_perfil_usuario">PantallaPerfilUsuario</string>
+    <string name="title_activity_pantalla_scanear_qr">PantallaScanearQr</string>
+    <string name="title_activity_pantalla_juego_versus">PantallaJuegoVersus</string>
 </resources>

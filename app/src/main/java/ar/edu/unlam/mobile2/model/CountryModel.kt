@@ -1,14 +1,16 @@
 package ar.edu.unlam.mobile2.model
 
-data class CountryModel (
-    val capital: Array<String>,
-    val flags : FlagsModel,
-    val translations: TranslationsModel,
-    val region: String,
-    val subregion: String,
-    val latlng: Array<Double>
-    ) {
+import java.io.Serializable
 
+data class CountryModel (
+    var capital: Array<String>,
+    var flags : FlagsModel,
+    var translations: TranslationsModel,
+    var region: String,
+    var subregion: String,
+    var latlng: Array<Double>
+    ) : Serializable {
+    
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -32,4 +34,5 @@ data class CountryModel (
         result = 31 * result + subregion.hashCode()
         return result
     }
+    
 }
