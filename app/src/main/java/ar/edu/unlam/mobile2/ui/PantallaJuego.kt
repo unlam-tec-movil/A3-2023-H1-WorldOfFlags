@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.model.CountryModel
 import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
 import ar.edu.unlam.mobile2.movimiento.TiltDirection
 import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel

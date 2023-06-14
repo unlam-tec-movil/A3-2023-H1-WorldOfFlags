@@ -21,6 +21,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -59,6 +60,7 @@ class PantallaQR : ComponentActivity() {
            }
        }
 
+
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
     @Composable
 
@@ -80,8 +82,27 @@ class PantallaQR : ComponentActivity() {
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.padding(top = 16.dp)
                 )
+                StartButton(modifier = Modifier)
                 QRCode()
             }
+        }
+    }
+
+    @Composable
+    fun StartButton(modifier: Modifier) {
+        Button(
+            modifier = modifier
+                .height(50.dp)
+                .width(180.dp),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
+
+            onClick = {
+                /*startActivity(Intent(this@PantallaQR, PantallaJuego::class.java))
+                finish()*/ //aca iría el pantallajuego15 quizás, llamando a get15Countries del viewmodel,
+                        // que sólo da los países sin generar QR
+            }) {
+            androidx.compose.material.Text(text = "Comenzar Versus")
         }
     }
 
@@ -96,6 +117,8 @@ class PantallaQR : ComponentActivity() {
             )
         }
     }
+
+
 
     @Composable
     fun ImagenLogo() {

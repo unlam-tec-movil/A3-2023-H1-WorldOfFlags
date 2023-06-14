@@ -47,6 +47,18 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
             250
         )
     }
+
+    suspend fun get15Countries(): List<CountryModel> {
+        val countriesList = service.getCountry()
+        val countries15 = mutableListOf<CountryModel>()
+        for (i in 0..14) {
+            val correctCountry = countriesList?.get(Random.nextInt(0, 250))
+            if (correctCountry != null) {
+                countries15.add(correctCountry)
+            }
+        }
+        return countries15
+    }
 }
 
 
