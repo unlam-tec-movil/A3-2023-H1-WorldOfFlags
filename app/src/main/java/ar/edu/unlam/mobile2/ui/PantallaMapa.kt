@@ -119,7 +119,6 @@ class PantallaMapa : ComponentActivity() {
         cameraPositionState: CameraPositionState,
         vidas: Int,
         versus: Boolean,
-        vidas: Int,
         index: Int
     ) {
         val intent = if (versus){
