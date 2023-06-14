@@ -3,6 +3,7 @@ package ar.edu.unlam.mobile2.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -40,13 +41,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +62,7 @@ import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
 import ar.edu.unlam.mobile2.movimiento.TiltDirection
 import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
+import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -72,7 +75,10 @@ import kotlin.random.Random
 class PantallaJuego : ComponentActivity() {
     private lateinit var motionDetector: DetectarMovimiento
     private val countriesViewModel: CountriesViewModel by viewModels()
-    val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
+    private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +92,7 @@ class PantallaJuego : ComponentActivity() {
 
     }
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     private fun launchCountries() {
         lifecycleScope.launch {
             countriesViewModel.startGame()
@@ -104,22 +111,30 @@ class PantallaJuego : ComponentActivity() {
                         countriesViewModel.longitudeCorrectCountryGame.value
 
 
-                    //val name =
-                    val user = UserRepository.getUser()
+                    lifecycleScope.launch{
+                        userViewModel.getUserDatabase()
+                    }
+
+                    val nameUser = userViewModel.userName.value
+                    val nationalityUser = userViewModel.nacionalityUser.value
+                    val imagenUser = userViewModel.imageUser.value
+
+
+                 /*   val user = UserRepository.getUser()
                     val nameUser = user?.nombre
                     val nationalityUser = user?.nacionalidad
-                    val imageUser = user?.imagen
+                    val imagenUser = user?.imagen */
 
 
 
 
 
 
-                    if (nameUser != null && nationalityUser != null && imageUser != null && flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
+                    if (nameUser != null && nationalityUser != null && flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
                         PrincipalScreen(
                             nameUser,
                             nationalityUser,
-                            imageUser,
+                            imagenUser,
                             flag,
                             correctCountryNameInGame,
                             incorrectCountryNameInGame,
@@ -127,7 +142,7 @@ class PantallaJuego : ComponentActivity() {
                             tiltDirection,
                             latitudeCorrectCountryGame,
                             longitudeCorrectCountryGame,
-                            )
+                        )
                     }
                 }
             }
@@ -138,7 +153,7 @@ class PantallaJuego : ComponentActivity() {
     fun PrincipalScreen(
         nameUser: String,
         nacionalityUser: String,
-        imageUser: ImageBitmap,
+        imageUser: ByteArray?,
         flag: String,
         correctCountryNameInGame: String,
         incorrectCountryNameInGame: String,
@@ -154,7 +169,7 @@ class PantallaJuego : ComponentActivity() {
                 .rotate(0F)
         ) {
             TopBarQR()
-            TopBlock(flag, nameUser,nacionalityUser,imageUser)
+            TopBlock(flag, nameUser, nacionalityUser, imageUser)
             Divider(
                 color = Color.DarkGray,
                 thickness = 5.5.dp,
@@ -171,8 +186,9 @@ class PantallaJuego : ComponentActivity() {
         }
     }
 
+    @SuppressLint("RememberReturnType")
     @Composable
-    fun TopBlock(flag: String, nameUser: String, nacionalityUser: String, imageUser: ImageBitmap) {
+    fun TopBlock(flag: String, nameUser: String, nacionalityUser: String, imageUser: ByteArray?) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -188,16 +204,27 @@ class PantallaJuego : ComponentActivity() {
             )
             {
 
+                val bitmap = remember {
+                    imageUser?.let {
+                        BitmapFactory.decodeByteArray(
+                            imageUser, 0,
+                            it.size
+                        )
+                    }
+                }
+                val imageBitmap = remember { bitmap?.asImageBitmap() }
 
-                Image(
-                    bitmap = imageUser,
-                    contentDescription = "Foto de perfil del usuario",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(start = 14.dp, top = 5.dp, bottom = 5.dp)
-                        .size(57.dp)
-                        .clip(CircleShape)
-                )
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = "Foto de perfil del usuario",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(start = 14.dp, top = 5.dp, bottom = 5.dp)
+                            .size(57.dp)
+                            .clip(CircleShape)
+                    )
+                }
                 //-------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp),

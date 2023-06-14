@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ar.edu.unlam.mobile2.model.UsuarioModel
 
 
 class PantallaPerfilUsuarioViewModel : ViewModel() {

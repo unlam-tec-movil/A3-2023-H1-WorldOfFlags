@@ -38,6 +38,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -50,20 +51,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.data.Database.UserEntity
+import ar.edu.unlam.mobile2.data.Database.toDatabase
 import ar.edu.unlam.mobile2.data.UserRepository
-import ar.edu.unlam.mobile2.model.UsuarioModel
+import ar.edu.unlam.mobile2.model.UserModel
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
+import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+import kotlinx.coroutines.coroutineScope
 
 
 class PantallaPerfilUsuario : ComponentActivity() {
-    val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
-
+    private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -72,8 +84,6 @@ class PantallaPerfilUsuario : ComponentActivity() {
             val email: String by viewModel.email.observeAsState(initial = "")
             val nacionalidad: String by viewModel.nacionalidad.observeAsState(initial = "")
             val scaffoldState = rememberScaffoldState()
-
-
 
 
             val fotoBitmap: Bitmap? = viewModel.fotosacadaAhora.value
@@ -146,8 +156,6 @@ class PantallaPerfilUsuario : ComponentActivity() {
 
         }
     }
-
-
 
 
     @Composable
@@ -254,6 +262,7 @@ class PantallaPerfilUsuario : ComponentActivity() {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
     fun botonGuardarCambios(
         modifier: Modifier,
@@ -262,15 +271,25 @@ class PantallaPerfilUsuario : ComponentActivity() {
         nacionalidad: String,
         imagenFoto: ImageBitmap?
     ) {
+
+        val bitmap = imagenFoto?.asAndroidBitmap()
+        val stream = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val imagenData: ByteArray = stream.toByteArray()
+
         Button(modifier = modifier
             .height(50.dp)
             .width(200.dp),
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
             onClick = {
-                val user= UsuarioModel(nombre,email,nacionalidad, imagenFoto!!)
-                UserRepository.setUser(user)
-              //  viewModel.saveUser(nombre, email, nacionalidad, imagenFoto)
+                val user = UserModel(nombre, email, nacionalidad, imagenData)
+                //Guardo en la base de datos
+                GlobalScope.launch(Dispatchers.Default) {
+                    userViewModel.setUserDatabase(user.toDatabase())
+                }
+                //Guardo en el repositorio local
+           //     UserRepository.setUser(user)
                 Toast.makeText(
                     this,
                     "Cambios guardados Correctamente",

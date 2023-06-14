@@ -1,15 +1,15 @@
 package ar.edu.unlam.mobile2.data
 
-import ar.edu.unlam.mobile2.model.UsuarioModel
+import ar.edu.unlam.mobile2.model.UserModel
 
 object UserRepository {
-    private var user: UsuarioModel? = null
+    private var user: UserModel? = null
 
-    fun getUser(): UsuarioModel? {
+    fun getUser(): UserModel? {
         return user
     }
 
-    fun setUser(newUser: UsuarioModel) {
+    fun setUser(newUser: UserModel) {
         user = newUser
     }
 
