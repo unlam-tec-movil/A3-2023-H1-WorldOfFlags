@@ -1,9 +1,13 @@
 package ar.edu.unlam.mobile2.ui
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -83,9 +87,18 @@ class PantallaJuego : ComponentActivity() {
     }
 
     private fun launchCountries() {
+        val progressDialog = AlertDialog.Builder(this@PantallaJuego)
+            .setView(R.layout.layout_loading)
+            .setCancelable(false)
+            .create()
+        progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        progressDialog.show()
+        
         lifecycleScope.launch {
             countriesViewModel.startGame()
             withContext(Dispatchers.Main) {
+                progressDialog.dismiss()
+                
                 setContent {
                     val flag = countriesViewModel.correctCountryFlagInGame.value
                     val correctCountryNameInGame = countriesViewModel.correctCountryNameInGame.value
@@ -245,10 +258,19 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    startActivity(intent)
-                                    Thread.sleep(2000)
-                                    buttonIsVisible = true
-                                    capitalVisibility = false
+                                    val progressDialog = AlertDialog.Builder(this@PantallaJuego)
+                                        .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
+                                        .setCancelable(false)
+                                        .create()
+                                    progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+                                    progressDialog.show()
+            
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        progressDialog.dismiss()
+                                        startActivity(intent)
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
+                                    }, 2000)
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
@@ -266,13 +288,24 @@ class PantallaJuego : ComponentActivity() {
                                     TiltDirection.LEFT -> {
                                         Toast.makeText(
                                             this@PantallaJuego,
-                                            "¡Izquierda Correcto!",
+                                            "¡Correcto!",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        Thread.sleep(2000)
-                                        startActivity(intent)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
+    
+                                        val progressDialog = AlertDialog.Builder(this@PantallaJuego)
+                                            .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
+                                            .setCancelable(false)
+                                            .create()
+                                        progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+                                        progressDialog.show()
+    
+                                        Handler(Looper.getMainLooper()).postDelayed({
+                                            progressDialog.dismiss()
+        
+                                            startActivity(intent)
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }, 2000)
                                     }
 
                                     else -> {
@@ -468,10 +501,20 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    startActivity(intent)
-                                    Thread.sleep(1500)
-                                    buttonIsVisible = true
-                                    capitalVisibility = false
+    
+                                    val progressDialog = AlertDialog.Builder(this@PantallaJuego)
+                                        .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
+                                        .setCancelable(false)
+                                        .create()
+                                    progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+                                    progressDialog.show()
+    
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        progressDialog.dismiss()
+                                        startActivity(intent)
+                                        buttonIsVisible = true
+                                        capitalVisibility = false
+                                    }, 2000)
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
@@ -489,13 +532,23 @@ class PantallaJuego : ComponentActivity() {
                                     TiltDirection.RIGHT -> {
                                         Toast.makeText(
                                             this@PantallaJuego,
-                                            "¡Derecha Correcto!",
+                                            "¡Correcto!",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        startActivity(intent)
-                                        Thread.sleep(1500)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
+    
+                                        val progressDialog = AlertDialog.Builder(this@PantallaJuego)
+                                            .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
+                                            .setCancelable(false)
+                                            .create()
+                                        progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+                                        progressDialog.show()
+    
+                                        Handler(Looper.getMainLooper()).postDelayed({
+                                            progressDialog.dismiss()
+                                            startActivity(intent)
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }, 2000)
                                     }
 
                                     else -> {
