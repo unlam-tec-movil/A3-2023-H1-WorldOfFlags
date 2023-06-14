@@ -93,8 +93,6 @@ class PantallaMapa : ComponentActivity() {
             val versus = intent.getBooleanExtra("versus", false)
             val index = intent.getIntExtra("index", 0)
             val vidas = intent.getIntExtra("vidas", 5)
-            val versus = intent.getBooleanExtra("versus", false)
-            val index = intent.getIntExtra("index", 0)
             val marker = LatLng(lat, lon)
 
             MapViewScreen(
