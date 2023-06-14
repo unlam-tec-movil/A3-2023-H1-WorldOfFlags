@@ -189,3 +189,4 @@ class PantallaQR : ComponentActivity() {
     }
 }
 
+

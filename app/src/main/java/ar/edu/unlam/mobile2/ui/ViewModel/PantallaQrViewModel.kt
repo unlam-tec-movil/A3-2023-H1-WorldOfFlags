@@ -116,3 +116,7 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
 
 
 
+
+
+
+

@@ -90,6 +90,8 @@ class PantallaMapa : ComponentActivity() {
 
             val lat = intent.getDoubleExtra("latitude", 0.0)
             val lon = intent.getDoubleExtra("longitude", 0.0)
+            val versus = intent.getBooleanExtra("versus", false)
+            val index = intent.getIntExtra("index", 0)
             val vidas = intent.getIntExtra("vidas", 5)
             val versus = intent.getBooleanExtra("versus", false)
             val index = intent.getIntExtra("index", 0)
