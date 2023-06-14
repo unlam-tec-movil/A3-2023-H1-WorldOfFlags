@@ -27,11 +27,12 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
     
     var codeQRBitmap = MutableLiveData<Bitmap?>()
     var codeQRGenerated = mutableStateOf(false)
+    var qrCodeContent = MutableLiveData<String?>()
     fun generateQR(){
         viewModelScope.launch {
             Log.i("PantallaQRViewModel", "Yendo a generar el QR")
-            val qrCodeContent = generateQRCodeContent()
-            codeQRBitmap.value = generateQRCode(qrCodeContent)
+            qrCodeContent.value = generateQRCodeContent()
+            codeQRBitmap.value = generateQRCode(qrCodeContent.value!!)
         }
     }
     

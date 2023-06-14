@@ -117,7 +117,7 @@ class PantallaQR : ComponentActivity() {
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
             onClick = {
                 lifecycleScope.launch {
-                    val content: String = viewModel.generateQRCodeContent()
+                    val content: String = viewModel.qrCodeContent.value!!
                     withContext(Dispatchers.Main){
                         countriesQR = viewModel.processQRCodeContent(content)
                         DatosJuego.listaPaises = countriesQR as List<CountryModel>
