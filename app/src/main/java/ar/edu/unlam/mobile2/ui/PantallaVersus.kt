@@ -71,7 +71,7 @@ class PantallaVersus : ComponentActivity() {
                 .width(180.dp),
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
-            onClick = {    startActivity(Intent(this@PantallaVersus, PantallaScanearQr::class.java))
+            onClick = { startActivity(Intent(this@PantallaVersus, PantallaScanearQr::class.java))
             }) {
             Text(text = "Scanear QR")
         }
