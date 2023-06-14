@@ -93,6 +93,7 @@ class PantallaMapa : ComponentActivity() {
             val lon = intent.getDoubleExtra("longitude", 0.0)
             val versus = intent.getBooleanExtra("versus", false)
             val index = intent.getIntExtra("index", 0)
+            val vidas = intent.getIntExtra("vidas", 5)
             val marker = LatLng(lat, lon)
 
             MapViewScreen(
@@ -104,7 +105,8 @@ class PantallaMapa : ComponentActivity() {
                 marker,
                 cameraPositionState,
                 versus,
-                index
+                index,
+                vidas
             )
         }
     }
@@ -127,6 +129,10 @@ class PantallaMapa : ComponentActivity() {
             Intent(this, PantallaJuego::class.java)
         }
         intent.putExtra("index", index)
+        vidas: Int
+    ) {
+        val intent = Intent(this, PantallaJuego::class.java)
+        intent.putExtra("vidas", vidas)
         Box(
             modifier = Modifier
                 .fillMaxSize()
