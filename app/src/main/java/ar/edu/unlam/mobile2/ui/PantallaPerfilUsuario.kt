@@ -65,6 +65,7 @@ import ar.edu.unlam.mobile2.data.UserRepository
 import ar.edu.unlam.mobile2.model.UserModel
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
 import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -72,7 +73,7 @@ import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import kotlinx.coroutines.coroutineScope
 
-
+@AndroidEntryPoint
 class PantallaPerfilUsuario : ComponentActivity() {
     private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
@@ -116,22 +117,13 @@ class PantallaPerfilUsuario : ComponentActivity() {
                     Modifier.align(CenterHorizontally),
                     nombre
                 )
-                //*********************************
-
-                //*********************************
                 Spacer(modifier = Modifier.padding(8.dp))
                 email(Modifier.align(CenterHorizontally), email)
-                //**************************************
-
-                //***************************************
                 Spacer(modifier = Modifier.padding(8.dp))
                 nacionalidad(
                     Modifier.align(CenterHorizontally),
                     nacionalidad
                 )
-                //*************************************
-
-                //************************************
                 Spacer(modifier = Modifier.padding(8.dp))
                 tomarFoto(Modifier.align(CenterHorizontally))
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -276,7 +268,6 @@ class PantallaPerfilUsuario : ComponentActivity() {
         val stream = ByteArrayOutputStream()
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
         val imagenData: ByteArray = stream.toByteArray()
-
         Button(modifier = modifier
             .height(50.dp)
             .width(200.dp),
@@ -285,11 +276,9 @@ class PantallaPerfilUsuario : ComponentActivity() {
             onClick = {
                 val user = UserModel(nombre, email, nacionalidad, imagenData)
                 //Guardo en la base de datos
-                GlobalScope.launch(Dispatchers.Default) {
-                    userViewModel.setUserDatabase(user.toDatabase())
-                }
+                userViewModel.setUserDatabase(user.toDatabase())
                 //Guardo en el repositorio local
-           //     UserRepository.setUser(user)
+                //     UserRepository.setUser(user)
                 Toast.makeText(
                     this,
                     "Cambios guardados Correctamente",

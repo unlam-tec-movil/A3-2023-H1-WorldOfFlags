@@ -71,14 +71,11 @@ import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 @AndroidEntryPoint
-
 class PantallaJuego : ComponentActivity() {
     private lateinit var motionDetector: DetectarMovimiento
     private val countriesViewModel: CountriesViewModel by viewModels()
     private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,22 +108,13 @@ class PantallaJuego : ComponentActivity() {
                         countriesViewModel.longitudeCorrectCountryGame.value
 
 
-                    lifecycleScope.launch{
-                        userViewModel.getUserDatabase()
-                    }
+
+                    userViewModel.getUserDatabase()
+
 
                     val nameUser = userViewModel.userName.value
                     val nationalityUser = userViewModel.nacionalityUser.value
                     val imagenUser = userViewModel.imageUser.value
-
-
-                 /*   val user = UserRepository.getUser()
-                    val nameUser = user?.nombre
-                    val nationalityUser = user?.nacionalidad
-                    val imagenUser = user?.imagen */
-
-
-
 
 
 

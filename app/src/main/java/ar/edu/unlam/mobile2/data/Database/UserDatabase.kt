@@ -7,18 +7,13 @@ import androidx.room.RoomDatabase
 import dagger.Provides
 
 
-@Database(
-    entities = [UserEntity::class],
-    version = 1,
-    exportSchema = false
-)
-
+@Database(entities =[UserEntity::class], version = 1)
 abstract class UserDatabase : RoomDatabase() {
 
 
     abstract fun userDao(): UserDao
 
-
+/*
      companion object{
          @Volatile
          private var INSTANCE : UserDatabase ?= null
@@ -34,6 +29,7 @@ abstract class UserDatabase : RoomDatabase() {
                  return intance
              }
          }
-     }
+     } */
+
 
 }
