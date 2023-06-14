@@ -121,6 +121,7 @@ class PantallaMapa : ComponentActivity() {
         marker: LatLng,
         cameraPositionState: CameraPositionState,
         versus: Boolean,
+        vidas: Int,
         index: Int
     ) {
         val intent = if (versus){
@@ -129,9 +130,6 @@ class PantallaMapa : ComponentActivity() {
             Intent(this, PantallaJuego::class.java)
         }
         intent.putExtra("index", index)
-        vidas: Int
-    ) {
-        val intent = Intent(this, PantallaJuego::class.java)
         intent.putExtra("vidas", vidas)
         Box(
             modifier = Modifier
@@ -191,9 +189,7 @@ class PantallaMapa : ComponentActivity() {
 
             )
     }
-}
-
-
+    
 @Composable
 fun MapViewContainer(marker: LatLng) {
 
@@ -267,3 +263,5 @@ private suspend fun CameraPositionState.centerOnLocation(latLng: LatLng) =
             )
         )
     }
+}
+
