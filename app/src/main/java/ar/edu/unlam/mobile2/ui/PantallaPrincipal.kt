@@ -28,7 +28,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.*
-import androidx.compose.material3.Scaffold
 
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -56,23 +55,23 @@ class PantallaPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-pantallaInicio()
 
+            val scaffoldState = rememberScaffoldState()
+
+            pantallaInicio(scaffoldState)
         }
     }
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState",
+    @SuppressLint(
+        "UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState",
         "UnusedMaterialScaffoldPaddingParameter"
     )
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun pantallaInicio() {
-        val scaffoldState = rememberScaffoldState()
-        //val scaffoldState = rememberUpdatedState(mutableStateOf(false) )
+    fun pantallaInicio(scaffoldState: ScaffoldState) {
         Scaffold(
-
             scaffoldState = scaffoldState,
-           topBar = { topBar() },
+            topBar = { topBar() },
         ) {
             Column(
                 modifier = Modifier
@@ -80,7 +79,6 @@ pantallaInicio()
                     .background(Color.Black)
             )
             {
-              //  topBar()
                 imagenLogo()
 
                 Spacer(modifier = Modifier.padding(28.dp))
@@ -92,54 +90,72 @@ pantallaInicio()
     }
 
 
-        @OptIn(ExperimentalMaterial3Api::class)
-        @Composable
-        fun topBar() {
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun topBar() {
 
-            var showMenu by remember {
-                mutableStateOf(false)
-            }
-            TopAppBar(
-                title = { Text(text = "", modifier = Modifier, Color.White) },
-           colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color(0xFF070707)),
-                actions = {
-                    IconButton(onClick = { showMenu = !showMenu }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
-                            contentDescription = "icono menu"
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = showMenu, onDismissRequest = { showMenu = false },
-                        modifier = Modifier
-                            .width(110.dp)
-                            .background(color = Color(0xFF335ABD)),
-                        )
-                    {
-                        DropdownMenuItem(onClick = {
-                            startActivity(Intent(this@PantallaPrincipal,PantallaPerfilUsuario::class.java))
-                        },
-                            text = {Text(text = "Perfil",
-                                color = Color(0xFF070707)) },
-
-                            leadingIcon = {
-                                Icon( imageVector = Icons.Filled.Person,
-                                    contentDescription = "volver")
-                            }
-                        )
-                        DropdownMenuItem(onClick = { finish() },
-                            text = {Text( text = "Salir",
-                                color = Color(0xFF070707))},
-                            leadingIcon = { Icon(imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "volver")
-
-                            }
-                                    )
-                    }
-                }
-
-                    )
+        var showMenu by remember {
+            mutableStateOf(false)
         }
+        TopAppBar(
+            title = { Text(text = "", modifier = Modifier, Color.White) },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(Color(0xFF070707)),
+            actions = {
+                IconButton(onClick = { showMenu = !showMenu }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
+                        contentDescription = "icono menu"
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMenu, onDismissRequest = { showMenu = false },
+                    modifier = Modifier
+                        .width(110.dp)
+                        .background(color = Color(0xFF335ABD)),
+                )
+                {
+                    DropdownMenuItem(onClick = {
+                        startActivity(
+                            Intent(
+                                this@PantallaPrincipal,
+                                PantallaPerfilUsuario::class.java
+                            )
+                        )
+                    },
+                        text = {
+                            Text(
+                                text = "Perfil",
+                                color = Color(0xFF070707)
+                            )
+                        },
+
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = "volver"
+                            )
+                        }
+                    )
+                    DropdownMenuItem(onClick = { finish() },
+                        text = {
+                            Text(
+                                text = "Salir",
+                                color = Color(0xFF070707)
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "volver"
+                            )
+
+                        }
+                    )
+                }
+            }
+
+        )
+    }
 
 
     @Composable
@@ -149,7 +165,7 @@ pantallaInicio()
                 .height(50.dp)
                 .width(180.dp),
             shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(  Color(0xFF396AE9)),
+            colors = ButtonDefaults.buttonColors(Color(0xFF396AE9)),
 
             onClick = {
                 startActivity(Intent(this@PantallaPrincipal, PantallaJuego::class.java))
@@ -167,7 +183,7 @@ pantallaInicio()
                 .height(50.dp)
                 .width(180.dp),
             shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors( Color(0xFF396AE9)),
+            colors = ButtonDefaults.buttonColors(Color(0xFF396AE9)),
 
 
             onClick = {

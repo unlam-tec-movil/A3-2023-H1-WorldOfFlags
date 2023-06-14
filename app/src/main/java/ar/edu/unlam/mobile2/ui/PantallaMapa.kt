@@ -1,8 +1,10 @@
 package ar.edu.unlam.mobile2.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import ar.edu.unlam.mobile2.model.MapState
 import ar.edu.unlam.mobile2.ui.ViewModel.MapViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -87,19 +88,51 @@ class PantallaMapa : ComponentActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         askPermission()
         setContent {
+            val lastKnowLocation = viewModel.state.value.lastKnowLocation
+            val showComposableWithUserLocation =
+                viewModel.state.value.showComposableWithUserLocation
+            val cameraPositionState = rememberCameraPositionState()
+
             val lat = intent.getDoubleExtra("latitude", 0.0)
             val lon = intent.getDoubleExtra("longitude", 0.0)
+            val versus = intent.getBooleanExtra("versus", false)
+            val index = intent.getIntExtra("index", 0)
+            val vidas = intent.getIntExtra("vidas", 5)
+            val marker = LatLng(lat, lon)
+
             MapViewScreen(
-                state = viewModel.state.value,
                 lat = lat,
-                lon = lon
+                lon = lon,
+                lastKnowLocation,
+                showComposableWithUserLocation,
+                marker,
+                cameraPositionState,
+                vidas,
+                versus,
+                index
             )
         }
     }
 
     @Composable
-    fun MapViewScreen(state: MapState, lat: Double, lon: Double) {
-        val context = LocalContext.current
+    fun MapViewScreen(
+        lat: Double,
+        lon: Double,
+        lastKnowLocation: Location?,
+        showComposableWithUserLocation: Boolean,
+        marker: LatLng,
+        cameraPositionState: CameraPositionState,
+        vidas: Int,
+        versus: Boolean,
+        index: Int
+    ) {
+        val intent = if (versus){
+            Intent(this, PantallaJuegoVersus::class.java)
+        } else {
+            Intent(this, PantallaJuego::class.java)
+        }
+        intent.putExtra("index", index)
+        intent.putExtra("vidas", vidas)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -109,12 +142,12 @@ class PantallaMapa : ComponentActivity() {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (state.lastKnowLocation != null && state.showComposableWithUserLocation) {
-                    MapViewContainerWithUserLocation(state, lat = lat, lon = lon)
+                if (lastKnowLocation != null && showComposableWithUserLocation) {
+                    MapViewContainerWithUserLocation(lastKnowLocation, lat = lat, lon = lon,cameraPositionState)
                     Spacer(modifier = Modifier.padding(15.dp))
-                    calculateDistance(state, lat = lat, lon = lon)
+                    showDistance(lat = lat, lon = lon)
                 } else {
-                    MapViewContainer(lat, lon)
+                    MapViewContainer(marker)
                 }
                 Spacer(modifier = Modifier.padding(15.dp))
 
@@ -126,9 +159,15 @@ class PantallaMapa : ComponentActivity() {
                     colors = ButtonDefaults.buttonColors(  Color(0xFF396AE9)),
 
                     onClick = {
+<<<<<<< HEAD
                         startActivity(Intent(this@PantallaMapa, PantallaJuego::class.java))
                         finish()
                     }) {
+=======
+                        startActivity(intent)
+                    }
+                ) {
+>>>>>>> main
                     Text(text = "Siguiente")
 
                 }
@@ -136,96 +175,107 @@ class PantallaMapa : ComponentActivity() {
         }
     }
 
-    @Composable
-    private fun calculateDistance(state: MapState, lat: Double, lon: Double) {
 
-        val lat1 = state.lastKnowLocation?.latitude
-        val lon1 = state.lastKnowLocation?.longitude
+    private fun calculateDistance(lat: Double, lon: Double): Int {
+        val lastKnowLocation = viewModel.state.value.lastKnowLocation
+
+        val lat1 = lastKnowLocation?.latitude
+        val lon1 = lastKnowLocation?.longitude
         val lat2 = lat
         val lon2 = lon
+        return (viewModel.calculateDistance(lat1, lon1, lat2, lon2) * 100).roundToInt() / 100
+    }
 
-        val distance = (viewModel.calculateDistance(lat1, lon1, lat2, lon2) * 100).roundToInt() /100
-
+    @Composable
+    fun showDistance(lat: Double, lon: Double) {
         Text(
-            text = "La distancia entre tu ubicacion y el pais es de $distance KM",
+            text = "La distancia entre tu ubicacion y el pais es de ${
+                calculateDistance(
+                    lat,
+                    lon
+                )
+            } KM",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.fillMaxWidth(),
             color = Color.Yellow,
             textAlign = TextAlign.Center,
-            fontSize = 18.sp ,
+            fontSize = 18.sp,
 
-        )
-    }
-
-
-    @Composable
-    fun MapViewContainer(lat: Double, lon: Double) {
-        val marker = LatLng(lat, lon)
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(marker, 0f)
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxHeight(0.75f)
-                .fillMaxWidth()
-        ) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState
-            ) {
-                Marker(position = marker)
-                rememberCameraPositionState()
-            }
-        }
-
-    }
-
-    @Composable
-    fun MapViewContainerWithUserLocation(state: MapState, lat: Double, lon: Double) {
-        val markerUser = remember { mutableStateOf<LatLng?>(null) }
-        val markerCountry = remember { mutableStateOf<LatLng?>(null) }
-        val mapProperties = MapProperties(
-            isMyLocationEnabled = state.lastKnowLocation != null,
-        )
-        val cameraPositionState = rememberCameraPositionState()
-
-        LaunchedEffect(Unit) {
-            if (state.lastKnowLocation != null) {
-                markerUser.value =
-                    LatLng(state.lastKnowLocation.latitude, state.lastKnowLocation.longitude)
-                markerCountry.value = LatLng(lat, lon)
-
-                cameraPositionState.centerOnLocation(markerCountry.value!!)
-            }
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxHeight(0.75f) // Mapa ocupa el 75% de la altura
-                .fillMaxWidth()
-        ) {
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxSize(),
-                properties = mapProperties,
-                cameraPositionState = cameraPositionState
-            ) {
-                markerUser.value?.let { userLatLng ->
-                    Marker(position = userLatLng)
-                }
-                markerCountry.value?.let { countryLatLng ->
-                    Marker(position = countryLatLng)
-                }
-            }
-        }
-    }
-
-    private suspend fun CameraPositionState.centerOnLocation(latLng: LatLng) =
-        withContext(Dispatchers.Main) {
-            animate(
-                update = CameraUpdateFactory.newLatLngZoom(
-                    latLng,
-                    0f
-                )
             )
+    }
+    
+@Composable
+fun MapViewContainer(marker: LatLng) {
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(marker, 0f)
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxHeight(0.75f)
+            .fillMaxWidth()
+    ) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            Marker(position = marker)
+            rememberCameraPositionState()
         }
+    }
+
 }
+@Composable
+fun MapViewContainerWithUserLocation(
+    lastKnowLocation: Location?,
+    lat: Double,
+    lon: Double,
+    cameraPositionState: CameraPositionState
+) {
+    val markerUser = remember { mutableStateOf<LatLng?>(null) }
+    val markerCountry = remember { mutableStateOf<LatLng?>(null) }
+    val mapProperties = MapProperties(
+        isMyLocationEnabled = lastKnowLocation != null,
+    )
+
+    LaunchedEffect(Unit) {
+        if (lastKnowLocation != null) {
+            markerUser.value =
+                LatLng(lastKnowLocation.latitude, lastKnowLocation.longitude)
+            markerCountry.value = LatLng(lat, lon)
+
+            cameraPositionState.centerOnLocation(markerCountry.value!!)
+        }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxHeight(0.75f) // Mapa ocupa el 75% de la altura
+            .fillMaxWidth()
+    ) {
+        GoogleMap(
+            modifier = Modifier
+                .fillMaxSize(),
+            properties = mapProperties,
+            cameraPositionState = cameraPositionState
+        ) {
+            markerUser.value?.let { userLatLng ->
+                Marker(position = userLatLng)
+            }
+            markerCountry.value?.let { countryLatLng ->
+                Marker(position = countryLatLng)
+            }
+        }
+    }
+}
+
+private suspend fun CameraPositionState.centerOnLocation(latLng: LatLng) =
+    withContext(Dispatchers.Main) {
+        animate(
+            update = CameraUpdateFactory.newLatLngZoom(
+                latLng,
+                0f
+            )
+        )
+    }
+}
+

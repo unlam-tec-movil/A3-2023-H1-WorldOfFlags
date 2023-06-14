@@ -1,8 +1,14 @@
 package ar.edu.unlam.mobile2.ui
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -17,6 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import ar.edu.unlam.mobile2.R
 
 
@@ -24,16 +32,16 @@ class PantallaVersus : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            pantallaInicio()
 
+            val scaffoldState = rememberScaffoldState()
+
+            pantallaInicio(scaffoldState)
         }
     }
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-    @Preview
     @Composable
-    fun pantallaInicio() {
-        val scaffoldState = rememberScaffoldState()
+    fun pantallaInicio(scaffoldState: ScaffoldState) {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { topBarVersus() },
@@ -54,6 +62,7 @@ class PantallaVersus : ComponentActivity() {
         }
     }
 
+
     @Composable
     fun ScanearQR(modifier: Modifier) {
         Button(
@@ -62,10 +71,9 @@ class PantallaVersus : ComponentActivity() {
                 .width(180.dp),
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
-
-            onClick = { /*aca cambiaria a la pantalla del juego solitario*/ }) {
+            onClick = { startActivity(Intent(this@PantallaVersus, PantallaScanearQr::class.java))
+            }) {
             Text(text = "Scanear QR")
-
         }
     }
     @Composable
@@ -76,7 +84,6 @@ class PantallaVersus : ComponentActivity() {
                 .width(180.dp),
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
-
             onClick = {
                 startActivity(Intent(this@PantallaVersus, PantallaQR::class.java))
                 finish()
