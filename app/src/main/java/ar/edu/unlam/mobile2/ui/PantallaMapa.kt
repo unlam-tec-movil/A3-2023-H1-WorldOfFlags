@@ -91,6 +91,8 @@ class PantallaMapa : ComponentActivity() {
 
             val lat = intent.getDoubleExtra("latitude", 0.0)
             val lon = intent.getDoubleExtra("longitude", 0.0)
+            val versus = intent.getBooleanExtra("versus", false)
+            val index = intent.getIntExtra("index", 0)
             val vidas = intent.getIntExtra("vidas", 5)
             val marker = LatLng(lat, lon)
 
@@ -102,6 +104,8 @@ class PantallaMapa : ComponentActivity() {
                 context,
                 marker,
                 cameraPositionState,
+                versus,
+                index,
                 vidas
             )
         }
@@ -116,6 +120,15 @@ class PantallaMapa : ComponentActivity() {
         context: Context,
         marker: LatLng,
         cameraPositionState: CameraPositionState,
+        versus: Boolean,
+        index: Int
+    ) {
+        val intent = if (versus){
+            Intent(this, PantallaJuegoVersus::class.java)
+        } else {
+            Intent(this, PantallaJuego::class.java)
+        }
+        intent.putExtra("index", index)
         vidas: Int
     ) {
         val intent = Intent(this, PantallaJuego::class.java)
