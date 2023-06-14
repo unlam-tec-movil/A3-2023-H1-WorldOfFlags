@@ -86,7 +86,6 @@ class PantallaMapa : ComponentActivity() {
             val lastKnowLocation = viewModel.state.value.lastKnowLocation
             val showComposableWithUserLocation =
                 viewModel.state.value.showComposableWithUserLocation
-            val context = LocalContext.current
             val cameraPositionState = rememberCameraPositionState()
 
             val lat = intent.getDoubleExtra("latitude", 0.0)
@@ -101,12 +100,11 @@ class PantallaMapa : ComponentActivity() {
                 lon = lon,
                 lastKnowLocation,
                 showComposableWithUserLocation,
-                context,
                 marker,
                 cameraPositionState,
+                vidas,
                 versus,
-                index,
-                vidas
+                index
             )
         }
     }
@@ -117,9 +115,9 @@ class PantallaMapa : ComponentActivity() {
         lon: Double,
         lastKnowLocation: Location?,
         showComposableWithUserLocation: Boolean,
-        context: Context,
         marker: LatLng,
         cameraPositionState: CameraPositionState,
+        vidas: Int,
         versus: Boolean,
         vidas: Int,
         index: Int

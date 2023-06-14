@@ -35,7 +35,7 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
         }
     }
     
-    private suspend fun generateQRCodeContent(): String {
+    suspend fun generateQRCodeContent(): String {
         Log.i("PantallaQRViewModel", "Estoy generando el contenido")
         val contentBuilder = StringBuilder()
         val countriesList = service.getCountry()
@@ -111,7 +111,12 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
         }
         return countries
     }
+    
 }
+
+
+
+
 
 
 
