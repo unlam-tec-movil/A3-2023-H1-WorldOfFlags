@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
@@ -51,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -59,14 +61,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
+import ar.edu.unlam.mobile2.data.UserRepository
 import ar.edu.unlam.mobile2.model.CountryModel
 import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
 import ar.edu.unlam.mobile2.movimiento.TiltDirection
 import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
+import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
+import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -75,7 +79,13 @@ import kotlin.random.Random
 class PantallaJuego : ComponentActivity() {
     private lateinit var motionDetector: DetectarMovimiento
     private val countriesViewModel: CountriesViewModel by viewModels()
+    private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
+
+
+
     private var vidas: Int = 0
+  
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     
@@ -85,8 +95,11 @@ class PantallaJuego : ComponentActivity() {
         motionDetector = DetectarMovimiento(this)
         motionDetector.start()
         launchCountries()
+
+
     }
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     private fun launchCountries() {
         val progressDialog = AlertDialog.Builder(this@PantallaJuego)
             .setView(R.layout.layout_loading)
@@ -112,8 +125,24 @@ class PantallaJuego : ComponentActivity() {
                         countriesViewModel.latitudeCorrectCountryGame.value
                     val longitudeCorrectCountryGame =
                         countriesViewModel.longitudeCorrectCountryGame.value
-                    if (flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
+
+
+                    userViewModel.getUserDatabase()
+
+
+                    val nameUser = userViewModel.userName.value
+                    val nationalityUser = userViewModel.nacionalityUser.value
+                    val imagenUser = userViewModel.imageUser.value
+
+
+
+                    if (nameUser != null && nationalityUser != null && flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
+
+                    
                         PrincipalScreen(
+                            nameUser,
+                            nationalityUser,
+                            imagenUser,
                             flag,
                             correctCountryNameInGame,
                             incorrectCountryNameInGame,
@@ -130,6 +159,9 @@ class PantallaJuego : ComponentActivity() {
 
     @Composable
     fun PrincipalScreen(
+        nameUser: String,
+        nacionalityUser: String,
+        imageUser: ByteArray?,
         flag: String,
         correctCountryNameInGame: String,
         incorrectCountryNameInGame: String,
@@ -145,7 +177,7 @@ class PantallaJuego : ComponentActivity() {
                 .rotate(0F)
         ) {
             TopBarQR()
-            TopBlock(flag)
+            TopBlock(flag, nameUser, nacionalityUser, imageUser)
             Divider(
                 color = Color.DarkGray,
                 thickness = 5.5.dp,
@@ -162,8 +194,9 @@ class PantallaJuego : ComponentActivity() {
         }
     }
 
+    @SuppressLint("RememberReturnType")
     @Composable
-    fun TopBlock(flag: String) {
+    fun TopBlock(flag: String, nameUser: String, nacionalityUser: String, imageUser: ByteArray?) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -178,22 +211,35 @@ class PantallaJuego : ComponentActivity() {
                     .background(color = Color(0xFF335ABD))
             )
             {
-                Image(
-                    painter = painterResource(id = R.drawable.avatar),
-                    contentDescription = "Foto de perfil del usuario",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(start = 14.dp, top = 5.dp, bottom = 5.dp)
-                        .size(57.dp)
-                        .clip(CircleShape)
-                )
+
+                val bitmap = remember {
+                    imageUser?.let {
+                        BitmapFactory.decodeByteArray(
+                            imageUser, 0,
+                            it.size
+                        )
+                    }
+                }
+                val imageBitmap = remember { bitmap?.asImageBitmap() }
+
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = "Foto de perfil del usuario",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(start = 14.dp, top = 5.dp, bottom = 5.dp)
+                            .size(57.dp)
+                            .clip(CircleShape)
+                    )
+                }
                 //-------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.padding(start = 20.dp, top = 7.dp)
                 ) {
-                    Text(text = "Nombre", color = Color.White, fontSize = 17.sp)
-                    Text("Nacionalidad", color = Color.White, fontSize = 17.sp)
+                    Text(text = nameUser, color = Color.White, fontSize = 17.sp)
+                    Text(nacionalityUser, color = Color.White, fontSize = 17.sp)
                 }
                 //----------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
