@@ -86,12 +86,13 @@ class PantallaMapa : ComponentActivity() {
             val lastKnowLocation = viewModel.state.value.lastKnowLocation
             val showComposableWithUserLocation =
                 viewModel.state.value.showComposableWithUserLocation
-            val context = LocalContext.current
             val cameraPositionState = rememberCameraPositionState()
 
             val lat = intent.getDoubleExtra("latitude", 0.0)
             val lon = intent.getDoubleExtra("longitude", 0.0)
             val vidas = intent.getIntExtra("vidas", 5)
+            val versus = intent.getBooleanExtra("versus", false)
+            val index = intent.getIntExtra("index", 0)
             val marker = LatLng(lat, lon)
 
             MapViewScreen(
@@ -99,10 +100,11 @@ class PantallaMapa : ComponentActivity() {
                 lon = lon,
                 lastKnowLocation,
                 showComposableWithUserLocation,
-                context,
                 marker,
                 cameraPositionState,
-                vidas
+                vidas,
+                versus,
+                index
             )
         }
     }
@@ -113,12 +115,18 @@ class PantallaMapa : ComponentActivity() {
         lon: Double,
         lastKnowLocation: Location?,
         showComposableWithUserLocation: Boolean,
-        context: Context,
         marker: LatLng,
         cameraPositionState: CameraPositionState,
-        vidas: Int
+        vidas: Int,
+        versus: Boolean,
+        index: Int
     ) {
-        val intent = Intent(this, PantallaJuego::class.java)
+        val intent = if (versus){
+            Intent(this, PantallaJuegoVersus::class.java)
+        } else {
+            Intent(this, PantallaJuego::class.java)
+        }
+        intent.putExtra("index", index)
         intent.putExtra("vidas", vidas)
         Box(
             modifier = Modifier
