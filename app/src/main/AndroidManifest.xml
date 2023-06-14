@@ -26,11 +26,7 @@
         android:theme="@style/Theme.Mobile2_Scaffolding"
         tools:targetApi="31"
         android:hardwareAccelerated="true">
-        <activity
-            android:name=".ui.PantallaJuegoVersus"
-            android:exported="false"
-            android:label="@string/title_activity_pantalla_juego_versus"
-            android:theme="@style/Theme.Mobile2_Scaffolding" />
+
         <activity
             android:name=".ui.PantallaScanearQr"
             android:exported="false"

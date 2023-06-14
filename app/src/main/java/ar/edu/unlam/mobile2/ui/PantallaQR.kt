@@ -2,7 +2,6 @@ package ar.edu.unlam.mobile2.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,11 +12,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -25,20 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaQrViewModel
-import coil.compose.AsyncImage
-import com.google.gson.Gson
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.WriterException
-import com.google.zxing.common.BitMatrix
-import com.google.zxing.qrcode.QRCodeWriter
-import com.google.zxing.qrcode.encoder.QRCode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.EnumMap
+
 
 @AndroidEntryPoint
 
