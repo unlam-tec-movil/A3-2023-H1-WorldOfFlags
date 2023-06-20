@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -83,11 +84,13 @@ class PantallaJuego : ComponentActivity() {
 
     private var cancelarMovimiento by mutableStateOf(true)
     private var vidas: Int = 0
+    private var puntos :Int =0
   
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     
         vidas = intent.getIntExtra("vidas", 5)
+        puntos = intent.getIntExtra("puntos", 0)
         cancelarMovimiento = intent.getBooleanExtra("cancelarMovimiento",false)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -231,6 +234,16 @@ class PantallaJuego : ComponentActivity() {
                             .size(57.dp)
                             .clip(CircleShape)
                     )
+                }else{
+                    Image(
+                        painterResource(id = R.drawable.avatar),
+                        contentDescription = "Foto de perfil del usuario",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(start = 14.dp, top = 5.dp, bottom = 5.dp)
+                            .size(57.dp)
+                            .clip(CircleShape)
+                    )
                 }
                 //-------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
@@ -245,7 +258,7 @@ class PantallaJuego : ComponentActivity() {
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.padding(start = 60.dp, top = 7.dp)
                 ) {
-                    Text(text = "Puntos : 0", color = Color.White, fontSize = 17.sp)
+                    Text(text = "Puntos :$puntos", color = Color.White, fontSize = 17.sp)
                     Text("Vidas : $vidas", color = Color.White, fontSize = 17.sp)
                 }
                 //----------------------------------------------------------------------------------------------------------------------------------------------
@@ -280,6 +293,7 @@ class PantallaJuego : ComponentActivity() {
         intent.putExtra("longitude", longitudeCorrectCountryGame)
         intent.putExtra("vidas", vidas)
 
+
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
                 Box(
@@ -305,6 +319,7 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    puntos+= 10
                                     val progressDialog = AlertDialog.Builder(this@PantallaJuego)
                                         .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
                                         .setCancelable(false)
@@ -318,6 +333,7 @@ class PantallaJuego : ComponentActivity() {
 
                                     Handler(Looper.getMainLooper()).postDelayed({
                                         progressDialog.dismiss()
+                                        intent.putExtra("puntos", puntos)
                                         intent.putExtra("cancelarMovimiento", cancelarMovimiento)
                                         startActivity(intent)
                                         buttonIsVisible = true
@@ -345,7 +361,7 @@ class PantallaJuego : ComponentActivity() {
                                                 "¡Correcto!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-
+                                            puntos +=10
                                             val progressDialog =
                                                 AlertDialog.Builder(this@PantallaJuego)
                                                     .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
@@ -359,6 +375,7 @@ class PantallaJuego : ComponentActivity() {
 
                                             Handler(Looper.getMainLooper()).postDelayed({
                                                 progressDialog.dismiss()
+                                                intent.putExtra("puntos", puntos)
                                                 intent.putExtra(
                                                     "cancelarMovimiento",
                                                     cancelarMovimiento
@@ -582,7 +599,7 @@ class PantallaJuego : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
-
+                                    puntos +=10
                                     val progressDialog = AlertDialog.Builder(this@PantallaJuego)
                                         .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
                                         .setCancelable(false)
@@ -597,6 +614,7 @@ class PantallaJuego : ComponentActivity() {
 
                                     Handler(Looper.getMainLooper()).postDelayed({
                                         progressDialog.dismiss()
+                                        intent.putExtra("puntos", puntos)
                                         intent.putExtra("cancelarMovimiento", cancelarMovimiento)
                                         startActivity(intent)
                                         buttonIsVisible = true
@@ -625,7 +643,7 @@ class PantallaJuego : ComponentActivity() {
                                             "¡Correcto!",
                                             Toast.LENGTH_SHORT
                                         ).show()
-
+                                        puntos +=10
                                         val progressDialog = AlertDialog.Builder(this@PantallaJuego)
                                             .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
                                             .setCancelable(false)
@@ -636,6 +654,7 @@ class PantallaJuego : ComponentActivity() {
     
                                         Handler(Looper.getMainLooper()).postDelayed({
                                             progressDialog.dismiss()
+                                            intent.putExtra("puntos", puntos)
                                             intent.putExtra("cancelarMovimiento",cancelarMovimiento)
                                             startActivity(intent)
                                             buttonIsVisible = true

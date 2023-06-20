@@ -29,7 +29,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-
 import ar.edu.unlam.mobile2.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,10 +90,13 @@ class PantallaQR : ComponentActivity() {
                     color = Color.White,
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.padding(top = 16.dp)
+
                 )
+                Spacer(modifier = Modifier.padding(10.dp))
                 if (codeQRGenerated) {
-                    StartButton(modifier = Modifier, context)
-                    QRCode(codeQR)
+                    QRCode(codeQR, modifier = Modifier.align(CenterHorizontally))
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    StartButton(modifier = Modifier.align(CenterHorizontally), context,)
                 } else {
                     // Muestra un indicador de carga mientras se genera el QR
                     CircularProgressIndicator(
@@ -112,7 +114,8 @@ class PantallaQR : ComponentActivity() {
         Button(
             modifier = modifier
                 .height(50.dp)
-                .width(180.dp),
+                .width(180.dp)
+                ,
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
             onClick = {
@@ -130,12 +133,13 @@ class PantallaQR : ComponentActivity() {
     }
     
     @Composable
-    fun QRCode(codeQR: Bitmap?) {
+    fun QRCode(codeQR: Bitmap?,modifier:Modifier) {
         codeQR?.let { QRCode ->
             Image(
                 bitmap = QRCode.asImageBitmap(), contentDescription = "",
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .height(400.dp)
+                    .width(400.dp),
                 contentScale = ContentScale.FillBounds
             )
         }
@@ -148,7 +152,7 @@ class PantallaQR : ComponentActivity() {
             contentDescription = "imagen logo",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp),
+                .height(100.dp),
         )
     }
     
