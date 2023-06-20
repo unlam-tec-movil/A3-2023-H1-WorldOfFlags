@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import ar.edu.unlam.mobile2.domain.CountriesService
 import ar.edu.unlam.mobile2.model.CountryModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+
 import javax.inject.Inject
 import kotlin.random.Random
 

@@ -72,6 +72,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import kotlinx.coroutines.coroutineScope
+import java.nio.ByteBuffer
 
 @AndroidEntryPoint
 class PantallaPerfilUsuario : ComponentActivity() {
@@ -263,30 +264,41 @@ class PantallaPerfilUsuario : ComponentActivity() {
         nacionalidad: String,
         imagenFoto: ImageBitmap?
     ) {
-
+        val imageInt: Int = R.drawable.avatar
+        val imageByte: ByteArray = ByteBuffer.allocate(4).putInt(imageInt).array()
         val bitmap = imagenFoto?.asAndroidBitmap()
         val stream = ByteArrayOutputStream()
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
         val imagenData: ByteArray = stream.toByteArray()
+
         Button(modifier = modifier
             .height(50.dp)
             .width(200.dp),
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
             onClick = {
-                val user = UserModel(nombre, email, nacionalidad, imagenData)
-                //Guardo en la base de datos
-                userViewModel.setUserDatabase(user.toDatabase())
+                if(imagenData.size>0) {
+                    val user = UserModel(nombre, email, nacionalidad, imagenData)
+
+                    //Guardo en la base de datos
+                    userViewModel.setUserDatabase(user.toDatabase())
+                }else{
+                    val user = UserModel(nombre, email, nacionalidad, imageByte)
+
+                    //Guardo en la base de datos
+                    userViewModel.setUserDatabase(user.toDatabase())
+                }
                 //Guardo en el repositorio local
                 //     UserRepository.setUser(user)
                 Toast.makeText(
                     this,
-                    "Cambios guardados Correctamente",
+                    "Usuario guardado Correctamente",
                     Toast.LENGTH_LONG
                 ).show()
+                startActivity(Intent(this@PantallaPerfilUsuario, PantallaPrincipal::class.java))
             }
         ) {
-            androidx.compose.material.Text(text = "Guardar Cambios")
+            Text(text = "Guardar Cambios")
         }
     }
 
@@ -298,7 +310,7 @@ class PantallaPerfilUsuario : ComponentActivity() {
         }
         TopAppBar(
             title = {
-                androidx.compose.material.Text(
+                Text(
                     text = "Mi Perfil",
                     modifier = Modifier,
                     Color.White,
