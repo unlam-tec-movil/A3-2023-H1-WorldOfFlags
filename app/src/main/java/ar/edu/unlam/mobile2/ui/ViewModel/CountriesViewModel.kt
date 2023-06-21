@@ -39,7 +39,7 @@ class CountriesViewModel @Inject constructor(private val service: CountriesServi
             }
         }
     
-    suspend fun startGameQR(country: CountryModel, countriesList: MutableList<CountryModel>){
+    suspend fun startGameQR(country: CountryModel){
         var incorrectCountry: CountryModel
         correctCountryNameInGame.value = country.translations.spa.common
         correctCountryFlagInGame.value = country.flags.png

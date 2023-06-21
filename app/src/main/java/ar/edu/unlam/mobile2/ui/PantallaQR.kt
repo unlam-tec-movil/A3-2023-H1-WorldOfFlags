@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 
 import ar.edu.unlam.mobile2.R
@@ -84,8 +85,10 @@ class PantallaQR : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black)
+                    .padding(vertical = 16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ImagenLogo()
                 Text(
                     text = "Escanea el siguiente QR",
                     color = Color.White,
@@ -93,8 +96,14 @@ class PantallaQR : ComponentActivity() {
                     modifier = Modifier.padding(top = 16.dp)
                 )
                 if (codeQRGenerated) {
-                    StartButton(modifier = Modifier, context)
-                    QRCode(codeQR)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                    ){
+                        QRCode(codeQR)
+                        StartButton(modifier = Modifier.align(Alignment.CenterHorizontally), context)
+                    }
                 } else {
                     // Muestra un indicador de carga mientras se genera el QR
                     CircularProgressIndicator(
@@ -110,16 +119,14 @@ class PantallaQR : ComponentActivity() {
     @Composable
     fun StartButton(modifier: Modifier, context: Context) {
         Button(
-            modifier = modifier
-                .height(50.dp)
-                .width(180.dp),
+            modifier = modifier,
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
             onClick = {
                 lifecycleScope.launch {
                     val content: String = viewModel.qrCodeContent.value!!
-                    withContext(Dispatchers.Main){
-                        countriesQR = viewModel.processQRCodeContent(content)
+                    withContext(Dispatchers.Main) {
+                        countriesQR = viewModel.createCountryModelByName(content)
                         DatosJuego.listaPaises = countriesQR as List<CountryModel>
                         startActivity(Intent(context, PantallaJuegoVersus::class.java))
                     }
@@ -135,21 +142,10 @@ class PantallaQR : ComponentActivity() {
             Image(
                 bitmap = QRCode.asImageBitmap(), contentDescription = "",
                 modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.FillBounds
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
             )
         }
-    }
-    
-    @Composable
-    fun ImagenLogo() {
-        Image(
-            painter = painterResource(id = R.drawable.mundo),
-            contentDescription = "imagen logo",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp),
-        )
     }
     
     @Composable
