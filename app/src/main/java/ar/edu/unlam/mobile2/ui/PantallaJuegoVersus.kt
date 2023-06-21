@@ -111,7 +111,7 @@ class PantallaJuegoVersus : ComponentActivity() {
             progressDialog.show()
             val country = countriesQR[countryIndex]
             lifecycleScope.launch {
-                countriesViewModel.startGameQR(country, countriesQR as MutableList<CountryModel>)
+                countriesViewModel.startGameQR(country)
                 countryIndex += 1
                 withContext(Dispatchers.Main){
                     progressDialog.dismiss()
