@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
-
 import ar.edu.unlam.mobile2.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,7 +93,9 @@ class PantallaQR : ComponentActivity() {
                     color = Color.White,
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.padding(top = 16.dp)
+
                 )
+                Spacer(modifier = Modifier.padding(10.dp))
                 if (codeQRGenerated) {
                     Column(
                         modifier = Modifier
