@@ -80,7 +80,6 @@ class PantallaPrincipal : ComponentActivity() {
             )
             {
                 imagenLogo()
-
                 Spacer(modifier = Modifier.padding(28.dp))
                 partidaSolitaria(Modifier.align(Alignment.CenterHorizontally))
                 Spacer(modifier = Modifier.padding(20.dp))

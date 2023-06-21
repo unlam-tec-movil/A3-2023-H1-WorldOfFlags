@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -38,7 +39,6 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -57,21 +57,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
-import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile2.R
-import ar.edu.unlam.mobile2.data.Database.UserEntity
 import ar.edu.unlam.mobile2.data.Database.toDatabase
-import ar.edu.unlam.mobile2.data.UserRepository
 import ar.edu.unlam.mobile2.model.UserModel
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
 import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
-import kotlinx.coroutines.coroutineScope
 import java.nio.ByteBuffer
 
 @AndroidEntryPoint
@@ -113,81 +106,149 @@ class PantallaPerfilUsuario : ComponentActivity() {
                     .fillMaxSize()
                     .background(Color.Black)
             ) {
-                Spacer(modifier = Modifier.padding(14.dp))
+                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                    Spacer(modifier = Modifier.padding(25.dp))
+                } else {
+                    Spacer(modifier = Modifier.padding(14.dp))
+                }
                 nombreRegistro(
                     Modifier.align(CenterHorizontally),
                     nombre
                 )
-                Spacer(modifier = Modifier.padding(8.dp))
+                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                    Spacer(modifier = Modifier.padding(25.dp))
+                } else {
+                    Spacer(modifier = Modifier.padding(8.dp))
+                }
                 email(Modifier.align(CenterHorizontally), email)
-                Spacer(modifier = Modifier.padding(8.dp))
+
+                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                    Spacer(modifier = Modifier.padding(25.dp))
+                } else {
+                    Spacer(modifier = Modifier.padding(8.dp))
+                }
                 nacionalidad(
                     Modifier.align(CenterHorizontally),
                     nacionalidad
                 )
-                Spacer(modifier = Modifier.padding(8.dp))
-                tomarFoto(Modifier.align(CenterHorizontally))
-                Spacer(modifier = Modifier.padding(10.dp))
+                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                    Spacer(modifier = Modifier.padding(25.dp))
+                } else {
+                    Spacer(modifier = Modifier.padding(8.dp))
+                }
+                if (userViewModel.getAllUserDatabase().isEmpty()) {
+                    tomarFoto(Modifier.align(CenterHorizontally))
+                }
+                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                    Spacer(modifier = Modifier.padding(25.dp))
+                } else {
+                    Spacer(modifier = Modifier.padding(10.dp))
+                }
                 fotoPerfil(
                     imagenFoto,
                     Modifier
                         .align(CenterHorizontally)
                         .clip(CircleShape)
                 )
-                Spacer(modifier = Modifier.padding(10.dp))
-                botonGuardarCambios(
-                    Modifier.align(CenterHorizontally),
-                    nombre,
-                    email,
-                    nacionalidad,
-                    imagenFoto
-                )
-                Text(nombre, color = Color.White)
-                Text(email, color = Color.White)
-                Text(nacionalidad, color = Color.White)
+                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                    Spacer(modifier = Modifier.padding(25.dp))
+                } else {
+                    Spacer(modifier = Modifier.padding(10.dp))
+                }
+                if (userViewModel.getAllUserDatabase().isEmpty()) {
+                    botonGuardarCambios(
+                        Modifier.align(CenterHorizontally),
+                        nombre,
+                        email,
+                        nacionalidad,
+                        imagenFoto
+                    )
+                }
             }
-
         }
     }
 
 
     @Composable
     fun nombreRegistro(modifier: Modifier, nombre: String) {
+        if (userViewModel.getAllUserDatabase().isEmpty()) {
+            TextField(
+                value = nombre, onValueChange = { viewModel._nombre.value = it },
+                modifier = modifier
+                    .width(300.dp)
+                    .clip(RoundedCornerShape(50.dp)),
+                label = { Text("Nombre") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true,
 
-        TextField(
-            value = nombre, onValueChange = { viewModel._nombre.value = it },
-            modifier = modifier
-                .width(300.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            label = { Text("Nombre") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
+                maxLines = 1,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color(0xFF0F0F0F),
+                    backgroundColor = Color(0xFF939599)
+                )
 
-            maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF0F0F0F),
-                backgroundColor = Color(0xFF939599)
             )
-        )
+
+        } else {
+            userViewModel.getUserDatabase()
+            TextField(
+                value = userViewModel.userName.value.toString(), onValueChange = {
+                    viewModel._nombre.value = it
+                },
+                modifier = modifier
+                    .width(300.dp)
+                    .clip(RoundedCornerShape(50.dp)),
+                label = { Text("Nombre") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true,
+
+                maxLines = 1,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color(0xFF0F0F0F),
+                    backgroundColor = Color(0xFF939599)
+                )
+            )
+        }
 
     }
 
     @Composable
     fun email(modifier: Modifier, email: String) {
-        TextField(
-            value = email, onValueChange = { viewModel._email.value = it },
-            modifier = modifier
-                .width(300.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            label = { Text("Email") },
-            singleLine = true,
-            maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF0F0F0F),
-                backgroundColor = Color(0xFF939599)
+        if (userViewModel.getAllUserDatabase().isEmpty()) {
+            TextField(
+                value = email, onValueChange = { viewModel._email.value = it },
+                modifier = modifier
+                    .width(300.dp)
+                    .clip(RoundedCornerShape(50.dp)),
+                label = { Text("Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true,
+
+                maxLines = 1,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color(0xFF0F0F0F),
+                    backgroundColor = Color(0xFF939599)
+                )
             )
-        )
+        } else {
+            userViewModel.getUserDatabase()
+            TextField(
+                value = userViewModel.emailUser.value.toString(), onValueChange = {
+                    viewModel._email.value = it
+                },
+                modifier = modifier
+                    .width(300.dp)
+                    .clip(RoundedCornerShape(50.dp)),
+                label = { Text("Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true,
+                maxLines = 1,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color(0xFF0F0F0F),
+                    backgroundColor = Color(0xFF939599)
+                )
+            )
+        }
     }
 
     @Composable
@@ -196,20 +257,42 @@ class PantallaPerfilUsuario : ComponentActivity() {
         nacionalidad: String,
 
         ) {
-        TextField(
-            value = nacionalidad, onValueChange = { viewModel._nacionalidad.value = it },
-            modifier = modifier
-                .width(300.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            label = { Text("Pais") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
-            maxLines = 1,
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color(0xFF0F0F0F),
-                backgroundColor = Color(0xFF939599)
+        if (userViewModel.getAllUserDatabase().isEmpty()) {
+            TextField(
+                value = nacionalidad, onValueChange = { viewModel._nacionalidad.value = it },
+                modifier = modifier
+                    .width(300.dp)
+                    .clip(RoundedCornerShape(50.dp)),
+                label = { Text("Nacionalidad") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true,
+
+                maxLines = 1,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color(0xFF0F0F0F),
+                    backgroundColor = Color(0xFF939599)
+                )
+
             )
-        )
+        } else {
+            userViewModel.getUserDatabase()
+            TextField(
+                value = userViewModel.nacionalityUser.value.toString(), onValueChange = {
+                    viewModel._email.value = it
+                },
+                modifier = modifier
+                    .width(300.dp)
+                    .clip(RoundedCornerShape(50.dp)),
+                label = { Text("Nacionalidad") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true,
+                maxLines = 1,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color(0xFF0F0F0F),
+                    backgroundColor = Color(0xFF939599)
+                )
+            )
+        }
     }
 
     @Composable
@@ -230,27 +313,58 @@ class PantallaPerfilUsuario : ComponentActivity() {
     @Composable
     fun fotoPerfil(imagenFoto: ImageBitmap?, modifier: Modifier) {
 
-        Box(
-            modifier = modifier
-                .height(250.dp)
-                .width(250.dp)
-        ) {
-            if (imagenFoto != null) {
+        if (userViewModel.getAllUserDatabase().isEmpty()) {
+            Box(
+                modifier = modifier
+                    .height(250.dp)
+                    .width(250.dp)
+            ) {
+                if (imagenFoto != null) {
 
-                Image(
-                    bitmap = imagenFoto, contentDescription = "",
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.avatar), contentDescription = "",
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()
-                )
+                    Image(
+                        bitmap = imagenFoto, contentDescription = "",
+                        modifier = modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.avatar),
+                        contentDescription = "IMAGEN POR DEFECTO",
+                        modifier = modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                    )
+                }
+            }
+        } else {
+            Box(
+                modifier = modifier
+                    .height(250.dp)
+                    .width(250.dp)
+            ) {
+                val userImage = userViewModel.imageUser.value
+
+                val bitmap = remember {
+                    userImage?.let {
+                        BitmapFactory.decodeByteArray(
+                            userImage, 0,
+                            it.size
+                        )
+                    }
+                }
+                val imageBitmap = remember { bitmap?.asImageBitmap() }
+
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap, contentDescription = "IMAGEN DEL USUARIO",
+                        modifier = modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }
@@ -277,12 +391,12 @@ class PantallaPerfilUsuario : ComponentActivity() {
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
             onClick = {
-                if(imagenData.size>0) {
+                if (imagenData.size > 0) {
                     val user = UserModel(nombre, email, nacionalidad, imagenData)
 
                     //Guardo en la base de datos
                     userViewModel.setUserDatabase(user.toDatabase())
-                }else{
+                } else {
                     val user = UserModel(nombre, email, nacionalidad, imageByte)
 
                     //Guardo en la base de datos
