@@ -10,9 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile2.domain.CountriesService
 import ar.edu.unlam.mobile2.model.CountryModel
-import ar.edu.unlam.mobile2.model.FlagsModel
-import ar.edu.unlam.mobile2.model.TranslationsModel
-import ar.edu.unlam.mobile2.model.TranslationsOptionsModel
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -40,15 +37,25 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
         Log.i("PantallaQRViewModel", "Estoy generando el contenido")
         val contentBuilder = StringBuilder()
         val countriesList = service.getCountry()
-        val randomCountries = countriesList?.shuffled()?.take(3)
+        val randomCountries = countriesList?.shuffled()?.take(15)
         if (randomCountries != null) {
             for (country in randomCountries){
-                val capital = country.capital.joinToString(",")
-                val latlng = country.latlng.joinToString(",")
-                contentBuilder.append("$capital,${country.flags.svg},${country.flags.png},${country.translations.por.official},${country.translations.por.common},${country.translations.spa.official},${country.translations.spa.common},${country.region},${country.subregion},$latlng\n")
+                contentBuilder.append(country.name.common).append("\n")
             }
         }
         return contentBuilder.toString()
+    }
+    
+    suspend fun createCountryModelByName (name: String): List<CountryModel>{
+        val countriesName: List<String> = processQRCodeContent(name)
+        val countriesList: MutableList<CountryModel> = mutableListOf()
+        for (countryName in countriesName){
+            val country: CountryModel? = service.getCountryByName(countryName)?.get(0)
+            if (country != null){
+                countriesList.add(country)
+            }
+        }
+        return countriesList
     }
     
     private fun generateQRCode(content: String): Bitmap? {
@@ -59,7 +66,7 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
         
         val writer = QRCodeWriter()
         try {
-            val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 512, 512, hints)
+            val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 1024, 1024, hints)
             val width = bitMatrix.width
             val height = bitMatrix.height
             val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
@@ -76,43 +83,18 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
         return null
     }
     
-    fun processQRCodeContent(qrCodeContent: String): List<CountryModel> {
+    private fun processQRCodeContent(qrCodeContent: String): List<String> {
         val lines = qrCodeContent.split("\n")
-        val countries = mutableListOf<CountryModel>()
-        for (line in lines) {
+        val countriesName = mutableListOf<String>()
+        for (line in lines){
             val parts = line.split(",")
-            if (parts.size == 11) {
-                val capital = parts[0].split(",").toTypedArray()
-                val flagSvg = parts[1]
-                val flagPng = parts[2]
-                val translationsPorOfficial = parts[3]
-                val translationsPorCommon = parts[4]
-                val translationsSpaOfficial = parts[5]
-                val translationsSpaCommon = parts[6]
-                val region = parts[7]
-                val subregion = parts[8]
-                val lat = parts[9].toDouble()
-                val lng = parts[10].toDouble()
-                
-                val latLng = arrayOf(lat,lng)
-                
-                val country = CountryModel(
-                    capital,
-                    FlagsModel(flagSvg, flagPng),
-                    TranslationsModel(
-                        TranslationsOptionsModel(translationsPorOfficial, translationsPorCommon),
-                        TranslationsOptionsModel(translationsSpaOfficial, translationsSpaCommon)
-                    ),
-                    region,
-                    subregion,
-                    latLng
-                )
-                countries.add(country)
+            if (parts.isNotEmpty()){
+                val name = parts[0]
+                countriesName.add(name)
             }
         }
-        return countries
+        return countriesName
     }
-    
 }
 
 

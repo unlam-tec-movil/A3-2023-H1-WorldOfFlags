@@ -3,7 +3,6 @@ package ar.edu.unlam.mobile2.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -15,10 +14,14 @@ import androidx.compose.ui.Modifier
 import com.google.zxing.integration.android.IntentIntegrator
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.model.CountryModel
 import ar.edu.unlam.mobile2.model.DatosJuego
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaQrViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class PantallaScanearQr : ComponentActivity() {
@@ -45,9 +48,14 @@ class PantallaScanearQr : ComponentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null && result.contents != null) {
-            countriesQR = viewModel.processQRCodeContent(result.contents)
-            DatosJuego.listaPaises = countriesQR as List<CountryModel>
-            startActivity(Intent(this, PantallaJuegoVersus::class.java))
+            val context = this
+            lifecycleScope.launch {
+                countriesQR = viewModel.createCountryModelByName(result.contents)
+                withContext(Dispatchers.Main){
+                    DatosJuego.listaPaises = countriesQR as List<CountryModel>
+                    startActivity(Intent(context, PantallaJuegoVersus::class.java))
+                }
+            }
         }
     }
     
