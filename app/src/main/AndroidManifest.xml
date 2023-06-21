@@ -29,6 +29,11 @@
         android:theme="@style/Theme.Mobile2_Scaffolding"
         tools:targetApi="31">
         <activity
+            android:name=".ui.PantallaFinJuegoVersus"
+            android:exported="false"
+            android:label="@string/title_activity_pantalla_fin_juego_versus"
+            android:theme="@style/Theme.Mobile2_Scaffolding" />
+        <activity
             android:name=".ui.PantallaCrearUsuario"
             android:exported="false"
             android:label="@string/title_activity_pantalla_crear_usuario"

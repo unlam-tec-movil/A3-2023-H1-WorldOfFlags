@@ -95,6 +95,7 @@ class PantallaMapa : ComponentActivity() {
             val index = intent.getIntExtra("index", 0)
             val vidas = intent.getIntExtra("vidas", 5)
             val puntos =  intent.getIntExtra("puntos", 0)
+            val paisesAcertados = intent.getIntExtra("paisesAcertados",0)
             val cancelarMovimiento =intent.getBooleanExtra("cancelarMovimiento",true)
             val marker = LatLng(lat, lon)
 
@@ -107,6 +108,7 @@ class PantallaMapa : ComponentActivity() {
                 cameraPositionState,
                 vidas,
                 puntos,
+                paisesAcertados,
                 cancelarMovimiento,
                 versus,
                 index
@@ -124,6 +126,7 @@ class PantallaMapa : ComponentActivity() {
         cameraPositionState: CameraPositionState,
         vidas: Int,
         puntos: Int,
+        paisesAcertados: Int,
         cancelarMovimiento: Boolean,
         versus: Boolean,
         index: Int
@@ -136,6 +139,7 @@ class PantallaMapa : ComponentActivity() {
         intent.putExtra("index", index)
         intent.putExtra("vidas", vidas)
         intent.putExtra("puntos", puntos)
+        intent.putExtra("paisesAcertados",paisesAcertados)
         intent.putExtra("cancelarMovimiento",cancelarMovimiento)
         Box(
             modifier = Modifier
