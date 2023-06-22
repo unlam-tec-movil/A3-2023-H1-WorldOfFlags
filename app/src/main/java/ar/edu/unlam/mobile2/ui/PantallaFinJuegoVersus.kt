@@ -7,13 +7,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -57,34 +55,37 @@ class PantallaFinJuegoVersus : ComponentActivity() {
                     .fillMaxSize()
                     .background(Color.Black)
             ) {
-
                 ImagenLogo()
                 Spacer(modifier = Modifier.padding(20.dp))
-                Box(
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
+                        Text(
+                            text = " Su Puntaje  es: $puntos  puntos    ",
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .align(CenterHorizontally),
+                            softWrap = true,
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = " Acertó $paisesAcertados  pais(es)",
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .align(CenterHorizontally),
+                            softWrap = true,
+                            fontSize = 25.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            overflow = TextOverflow.Ellipsis,
+                        )
 
-                        .heightIn(min = 100.dp, max = 200.dp)
-                ) {
-                    Text(
-                        text = " Su Puntaje  es $puntos       "
-                                + "                          Acertó $paisesAcertados pais(es)",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        softWrap = true,
-                        fontSize = 25.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
                 Spacer(modifier = Modifier.padding(10
                     .dp))
-                boton(Modifier.align(Alignment.CenterHorizontally))
+                boton(Modifier.align(CenterHorizontally))
             }
-
     }
 
     @Composable
@@ -97,7 +98,7 @@ class PantallaFinJuegoVersus : ComponentActivity() {
             colors = ButtonDefaults.buttonColors(Color(0xFF396AE9)),
 
             onClick = {
-                startActivity(Intent(this@PantallaFinJuegoVersus, PantallaVersus::class.java))
+                startActivity(Intent(this@PantallaFinJuegoVersus, PantallaPrincipal::class.java))
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish()
             }) {

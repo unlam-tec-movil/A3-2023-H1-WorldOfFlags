@@ -189,15 +189,15 @@ class PantallaMapa : ComponentActivity() {
     @Composable
     fun showDistance(lat: Double, lon: Double) {
         Text(
-            text = "La distancia entre tu ubicacion y el pais es de ${
+            text = "Usted se encuentra a ${
                 calculateDistance(
                     lat,
                     lon
                 )
-            } KM",
+            } KM del pais acertado",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.fillMaxWidth(),
-            color = Color.Yellow,
+            color = Color(0xFF396AE9),
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
 
