@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 
 import androidx.compose.animation.AnimatedVisibility
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -86,6 +88,7 @@ class PantallaJuegoVersus : ComponentActivity() {
     private val userViewModel: UserViewModel by viewModels()
     private var countryIndex: Int = 0
     private var puntos :Int =0
+    private var paisesAcertados: Int =0
     private var cancelarMovimiento by mutableStateOf(true)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,10 +99,12 @@ class PantallaJuegoVersus : ComponentActivity() {
         countryIndex = intent.getIntExtra("index", 0)
         countriesQR = DatosJuego.listaPaises
         puntos = intent.getIntExtra("puntos", 0)
+        paisesAcertados = intent.getIntExtra("paisesAcertados",0)
         cancelarMovimiento = intent.getBooleanExtra("cancelarMovimiento",false)
         launchCountries()
     }
-    
+    private var terminoElJuego by mutableStateOf(false)
+    @OptIn(ExperimentalAnimationApi::class)
     private fun launchCountries(){
         
         if (countryIndex != countriesQR.size) {
@@ -150,15 +155,15 @@ class PantallaJuegoVersus : ComponentActivity() {
                 }
             }
         } else {
-            Toast.makeText(
-                this@PantallaJuegoVersus,
-                "Game Over",
-                Toast.LENGTH_SHORT
-            ).show()
-            Thread.sleep(1500)
-            startActivity(Intent(this@PantallaJuegoVersus, PantallaPrincipal::class.java))
+                val intent = Intent(this, PantallaFinJuegoVersus::class.java)
+                intent.putExtra("paisesAcertados", paisesAcertados)
+                intent.putExtra("puntos", puntos)
+               startActivity(intent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+            }
         }
-    }
+
 
     @Composable
     fun PrincipalScreen(
@@ -321,7 +326,9 @@ class PantallaJuegoVersus : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    paisesAcertados+=1
                                     puntos+=10
+                                    intent.putExtra("paisesAcertados",paisesAcertados)
                                     intent.putExtra("puntos", puntos)
                                     startActivity(intent)
                                     Thread.sleep(2000)
@@ -348,8 +355,10 @@ class PantallaJuegoVersus : ComponentActivity() {
                                                 "¡Izquierda Correcto!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
+                                            paisesAcertados+=1
                                             puntos+=10
                                             Thread.sleep(2000)
+                                            intent.putExtra("paisesAcertados",paisesAcertados)
                                             intent.putExtra("puntos", puntos)
                                             startActivity(intent)
                                             buttonIsVisible = true
@@ -509,7 +518,9 @@ class PantallaJuegoVersus : ComponentActivity() {
                                         "¡Correcto!",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    paisesAcertados+=1
                                     puntos+=10
+                                    intent.putExtra("paisesAcertados",paisesAcertados)
                                     intent.putExtra("puntos", puntos)
                                     startActivity(intent)
                                     Thread.sleep(1500)
@@ -536,7 +547,9 @@ class PantallaJuegoVersus : ComponentActivity() {
                                             "¡Derecha Correcto!",
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                        paisesAcertados+=1
                                         puntos+=10
+                                        intent.putExtra("paisesAcertados",paisesAcertados)
                                         intent.putExtra("puntos", puntos)
                                         startActivity(intent)
                                         Thread.sleep(1500)
