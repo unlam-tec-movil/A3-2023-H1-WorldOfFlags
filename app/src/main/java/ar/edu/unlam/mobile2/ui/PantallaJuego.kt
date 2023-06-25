@@ -16,8 +16,12 @@ import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,18 +45,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -70,6 +78,7 @@ import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -85,10 +94,10 @@ class PantallaJuego : ComponentActivity() {
     private var cancelarMovimiento by mutableStateOf(true)
     private var vidas: Int = 0
     private var puntos :Int =0
-  
+    private var acertado by mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    
+
         vidas = intent.getIntExtra("vidas", 5)
         puntos = intent.getIntExtra("puntos", 0)
         cancelarMovimiento = intent.getBooleanExtra("cancelarMovimiento",false)
@@ -161,6 +170,7 @@ class PantallaJuego : ComponentActivity() {
 
     @Composable
     fun PrincipalScreen(
+
         nameUser: String,
         nacionalityUser: String,
         imageUser: ByteArray?,
@@ -172,6 +182,7 @@ class PantallaJuego : ComponentActivity() {
         latitudeCorrectCountryGame: Double,
         longitudeCorrectCountryGame: Double,
     ) {
+
         Column(
             Modifier
                 .fillMaxSize()
@@ -179,21 +190,27 @@ class PantallaJuego : ComponentActivity() {
                 .rotate(0F)
         ) {
             TopBar()
+
             TopBlock(flag, nameUser, nacionalityUser, imageUser)
             Divider(
                 color = Color.DarkGray,
                 thickness = 5.5.dp,
                 modifier = Modifier.padding(top = 25.dp)
             )
-            BottomBlock(
-                correctCountryNameInGame,
-                incorrectCountryNameInGame,
-                tiltDirection, latitudeCorrectCountryGame,
-                longitudeCorrectCountryGame
-            )
+
+                BottomBlock(
+                    correctCountryNameInGame,
+                    incorrectCountryNameInGame,
+                    tiltDirection, latitudeCorrectCountryGame,
+                    longitudeCorrectCountryGame
+                )
             Spacer(modifier = Modifier.padding(65.dp))
             ShowCapital(correctCountryCapitalInGame)
         }
+        CountriErrorAnimation(Modifier.drawWithContent {
+            drawContent()
+        })
+
     }
 
     @SuppressLint("RememberReturnType")
@@ -296,6 +313,7 @@ class PantallaJuego : ComponentActivity() {
 
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -311,6 +329,7 @@ class PantallaJuego : ComponentActivity() {
                             Modifier.width(150.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+
                             // Boton para el país correcto
                             Button(
                                 onClick = { if(cancelarMovimiento == true) {
@@ -353,7 +372,6 @@ class PantallaJuego : ComponentActivity() {
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 if(cancelarMovimiento == false){
-
                                     when (tiltDirection.value) {
                                     TiltDirection.LEFT -> {
                                             Toast.makeText(
@@ -370,9 +388,7 @@ class PantallaJuego : ComponentActivity() {
                                             progressDialog.window?.setBackgroundDrawable(
                                                 ColorDrawable(android.graphics.Color.TRANSPARENT)
                                             )
-
                                             progressDialog.show()
-
                                             Handler(Looper.getMainLooper()).postDelayed({
                                                 progressDialog.dismiss()
                                                 intent.putExtra("puntos", puntos)
@@ -385,7 +401,6 @@ class PantallaJuego : ComponentActivity() {
                                                 capitalVisibility = false
                                             }, 2000)
                                         }
-
                                     else -> {
                                     }
                                 }}
@@ -410,15 +425,13 @@ class PantallaJuego : ComponentActivity() {
                                 onClick = {
                                     if(cancelarMovimiento == true){
                                     if (vidas > 1) {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Incorrecto :(",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        launchCountries()
-                                        Thread.sleep(1500)
                                         buttonIsVisible = true
                                         capitalVisibility = false
+                                        acertado = true
+                                        lifecycleScope.launch {
+                                            delay(2000)
+                                            launchCountries()
+                                        }
                                         this@PantallaJuego.vidas -= 1
                                     } else {
                                         Toast.makeText(
@@ -426,13 +439,14 @@ class PantallaJuego : ComponentActivity() {
                                             "Game Over",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        Thread.sleep(1500)
+                                        Thread.sleep(2000)
                                         startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
                                     }
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
-                            ) {
+                            )
+                            {
                                 Text(
                                     text = incorrectCountryNameInGame,
                                     style = MaterialTheme.typography.headlineMedium,
@@ -448,14 +462,11 @@ class PantallaJuego : ComponentActivity() {
                                 when (tiltDirection.value) {
                                     TiltDirection.RIGHT -> {
                                         if (vidas > 0) {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Incorrecto :(",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-
-                                            launchCountries()
-                                            Thread.sleep(1500)
+                                            acertado = true
+                                            lifecycleScope.launch {
+                                                delay(2000)
+                                                launchCountries()
+                                            }
                                             buttonIsVisible = true
                                             capitalVisibility = false
                                             this@PantallaJuego.vidas -= 1
@@ -469,7 +480,6 @@ class PantallaJuego : ComponentActivity() {
                                             startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
                                         }
                                     }
-
                                     else -> {
                                     }
                                 }
@@ -500,13 +510,11 @@ class PantallaJuego : ComponentActivity() {
                             Button(
                                 onClick = { if(cancelarMovimiento == true) {
                                     if (vidas > 0) {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Incorrecto :(",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        launchCountries()
-                                        Thread.sleep(1500)
+                                        acertado = true
+                                        lifecycleScope.launch {
+                                            delay(1500)
+                                            launchCountries()
+                                        }
                                         buttonIsVisible = true
                                         capitalVisibility = false
                                         this@PantallaJuego.vidas -= 1
@@ -516,7 +524,7 @@ class PantallaJuego : ComponentActivity() {
                                             "Game Over",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        Thread.sleep(1500)
+                                        Thread.sleep(2000)
                                         startActivity(
                                             Intent(
                                                 this@PantallaJuego,
@@ -543,14 +551,11 @@ class PantallaJuego : ComponentActivity() {
                                 when (tiltDirection.value) {
                                     TiltDirection.LEFT -> {
                                         if (vidas > 0) {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Incorrecto :(",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-
-                                            launchCountries()
-                                            Thread.sleep(1500)
+                                            acertado = true
+                                            lifecycleScope.launch {
+                                                delay(2000)
+                                                launchCountries()
+                                            }
                                             buttonIsVisible = true
                                             capitalVisibility = false
                                             this@PantallaJuego.vidas -= 1
@@ -569,12 +574,10 @@ class PantallaJuego : ComponentActivity() {
                                             )
                                         }
                                     }
-
                                     else -> {
                                     }
                                 }
                                 }
-
                             }
                         }
                         Divider(
@@ -675,6 +678,43 @@ class PantallaJuego : ComponentActivity() {
     }
 
 
+@Composable
+fun CountriErrorAnimation(modifier:Modifier) {
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(acertado) {
+            if (acertado) {
+                scope.launch {
+                    delay(2000)
+                    acertado = false
+                }
+            }
+        }
+    AnimatedVisibility(
+        acertado,enter = fadeIn() + slideInVertically(),
+        exit = fadeOut() + slideOutVertically(),
+
+    ) {
+        Box( modifier = Modifier
+            .size(450.dp)
+            .background(Color.Transparent), BottomCenter ) {
+            Column() {
+
+                Image(painterResource(id = R.drawable.errornuevo),
+                    modifier=Modifier.align(CenterHorizontally),
+                    contentDescription = "")
+                Text(
+                    text = "incorrecto",
+                    fontSize = 50.sp,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Color(0xFFF00F2A)
+                )
+            }
+
+        }
+    }
+
+}
+
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun ShowCapital(correctCountryCapitalInGame: String) {
@@ -722,7 +762,18 @@ class PantallaJuego : ComponentActivity() {
     fun TopBar() {
 
         TopAppBar(
-            title = { Text(text = "", modifier = Modifier, Color.White) },
+
+                title = {
+                    if (!cancelarMovimiento) {
+                        Text(text = "Desactivar Movimiento ->", modifier = Modifier, Color(
+                            0xFF396AE9
+                        )
+                        )
+                    }else{
+                        Text(text = "Activar Movimiento    ->", modifier = Modifier, Color( 0xFF396AE9))
+                    }
+                }
+            ,
             backgroundColor = Color.Black,
             actions = {
                 IconButton(onClick = { this@PantallaJuego.cancelarMovimiento =! this@PantallaJuego.cancelarMovimiento})
@@ -732,13 +783,14 @@ class PantallaJuego : ComponentActivity() {
                             painter = painterResource(id = R.drawable.movimiento_on),
                             contentDescription = "movimiento ok"
                         )
-                    }else{ Image(
+                    }else{
+                        Image(
                         painter = painterResource(id = R.drawable.movimento_of),
                         contentDescription = "movimiento of"
                     )
                     }
                 }
-                Spacer(modifier = Modifier.width(130.dp))
+                Spacer(modifier = Modifier.width(120.dp))
                 IconButton(onClick = {
                     startActivity(
                         Intent(
