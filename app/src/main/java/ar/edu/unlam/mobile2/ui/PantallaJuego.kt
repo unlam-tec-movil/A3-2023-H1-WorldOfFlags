@@ -13,13 +13,23 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,12 +62,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
@@ -84,14 +95,14 @@ class PantallaJuego : ComponentActivity() {
 
     private var cancelarMovimiento by mutableStateOf(true)
     private var vidas: Int = 0
-    private var puntos :Int =0
-  
+    private var puntos: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    
+
         vidas = intent.getIntExtra("vidas", 5)
         puntos = intent.getIntExtra("puntos", 0)
-        cancelarMovimiento = intent.getBooleanExtra("cancelarMovimiento",false)
+        cancelarMovimiento = intent.getBooleanExtra("cancelarMovimiento", false)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         motionDetector = DetectarMovimiento(this)
@@ -109,12 +120,12 @@ class PantallaJuego : ComponentActivity() {
             .create()
         progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
         progressDialog.show()
-        
+
         lifecycleScope.launch {
             countriesViewModel.startGame()
             withContext(Dispatchers.Main) {
                 progressDialog.dismiss()
-                
+
                 setContent {
                     val flag = countriesViewModel.correctCountryFlagInGame.value
                     val correctCountryNameInGame = countriesViewModel.correctCountryNameInGame.value
@@ -140,7 +151,7 @@ class PantallaJuego : ComponentActivity() {
 
                     if (nameUser != null && nationalityUser != null && flag != null && correctCountryNameInGame != null && incorrectCountryNameInGame != null && correctCountryCapitalInGame != null && latitudeCorrectCountryGame != null && longitudeCorrectCountryGame != null) {
 
-                    
+
                         PrincipalScreen(
                             nameUser,
                             nationalityUser,
@@ -191,14 +202,140 @@ class PantallaJuego : ComponentActivity() {
                 tiltDirection, latitudeCorrectCountryGame,
                 longitudeCorrectCountryGame
             )
-            Spacer(modifier = Modifier.padding(65.dp))
+            Spacer(modifier = Modifier.padding(15.dp))
+            ExpandableContent()
+            Spacer(modifier = Modifier.padding(5.dp))
             ShowCapital(correctCountryCapitalInGame)
+
+        }
+    }
+
+    @Composable
+    fun imagenAyuda() {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.aiuda),
+                contentDescription = "Ayuda",
+                modifier = Modifier.size(40.dp)
+            )
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Composable
+    fun ExpandableContent() {
+        var expanded by remember { mutableStateOf(false) }
+
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier
+                .clickable { expanded = !expanded }
+                .padding(16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            AnimatedContent(
+                targetState = expanded,
+                transitionSpec = {
+                    fadeIn(
+                        animationSpec = tween(
+                            750,
+                            300
+                        )
+                    ) with fadeOut(animationSpec = tween(750)) using
+                            SizeTransform { initialSize, targetSize ->
+                                if (targetState) {
+                                    keyframes {
+                                        IntSize(
+                                            targetSize.width,
+                                            initialSize.height
+                                        ) at 400
+                                        durationMillis = 750
+                                    }
+                                } else {
+                                    keyframes {
+                                        IntSize(initialSize.width, targetSize.height) at 400
+                                        durationMillis = 750
+                                    }
+                                }
+                            }
+                }
+            ) { targetExpanded ->
+                if (targetExpanded) {
+                    Column() {
+                        optionRotation()
+                        optionClick()
+                    }
+
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.aiuda),
+                        contentDescription = "Ayuda",
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun optionClick() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .background(Color.Gray)
+                .padding(top = 2.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.celu_sin_movimiento),
+                contentDescription = "Imagen",
+                modifier = Modifier.size(40.dp)
+            )
+            Text(
+                text = "Presione la opcion correcta",
+                style = TextStyle(fontSize = 18.sp),
+                color = Color.White,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .weight(1f)
+            )
+        }
+    }
+
+    @Composable
+    private fun optionRotation() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.background(Color.Gray)
+
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.rotacelu),
+                contentDescription = "Imagen",
+                modifier = Modifier.size(40.dp)
+            )
+            Text(
+                text = "Rote el dispositivo en dirección a la opción correcta",
+                style = TextStyle(fontSize = 18.sp),
+                color = Color.White,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .weight(1f)
+            )
         }
     }
 
     @SuppressLint("RememberReturnType")
     @Composable
-    fun TopBlock(flag: String, nameUser: String, nacionalityUser: String, imageUser: ByteArray?) {
+    fun TopBlock(
+        flag: String,
+        nameUser: String,
+        nacionalityUser: String,
+        imageUser: ByteArray?
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -234,7 +371,7 @@ class PantallaJuego : ComponentActivity() {
                             .size(57.dp)
                             .clip(CircleShape)
                     )
-                }else{
+                } else {
                     Image(
                         painterResource(id = R.drawable.avatar),
                         contentDescription = "Foto de perfil del usuario",
@@ -313,33 +450,39 @@ class PantallaJuego : ComponentActivity() {
                         ) {
                             // Boton para el país correcto
                             Button(
-                                onClick = { if(cancelarMovimiento == true) {
-                                    Toast.makeText(
-                                        this@PantallaJuego,
-                                        "¡Correcto!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    puntos+= 10
-                                    val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-                                        .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
-                                        .setCancelable(false)
-                                        .create()
-                                    progressDialog.window?.setBackgroundDrawable(
-                                        ColorDrawable(
-                                            android.graphics.Color.TRANSPARENT
+                                onClick = {
+                                    if (cancelarMovimiento == true) {
+                                        Toast.makeText(
+                                            this@PantallaJuego,
+                                            "¡Correcto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        puntos += 10
+                                        val progressDialog =
+                                            AlertDialog.Builder(this@PantallaJuego)
+                                                .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
+                                                .setCancelable(false)
+                                                .create()
+                                        progressDialog.window?.setBackgroundDrawable(
+                                            ColorDrawable(
+                                                android.graphics.Color.TRANSPARENT
+                                            )
                                         )
-                                    )
-                                    progressDialog.show()
+                                        progressDialog.show()
 
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        progressDialog.dismiss()
-                                        intent.putExtra("puntos", puntos)
-                                        intent.putExtra("cancelarMovimiento", cancelarMovimiento)
-                                        startActivity(intent)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                    }, 2000)
-                                }},
+                                        Handler(Looper.getMainLooper()).postDelayed({
+                                            progressDialog.dismiss()
+                                            intent.putExtra("puntos", puntos)
+                                            intent.putExtra(
+                                                "cancelarMovimiento",
+                                                cancelarMovimiento
+                                            )
+                                            startActivity(intent)
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }, 2000)
+                                    }
+                                },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
                                 Text(
@@ -352,16 +495,16 @@ class PantallaJuego : ComponentActivity() {
                                     maxLines = 2,
                                     overflow = TextOverflow.Ellipsis,
                                 )
-                                if(cancelarMovimiento == false){
+                                if (cancelarMovimiento == false) {
 
                                     when (tiltDirection.value) {
-                                    TiltDirection.LEFT -> {
+                                        TiltDirection.LEFT -> {
                                             Toast.makeText(
                                                 this@PantallaJuego,
                                                 "¡Correcto!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                            puntos +=10
+                                            puntos += 10
                                             val progressDialog =
                                                 AlertDialog.Builder(this@PantallaJuego)
                                                     .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
@@ -386,9 +529,10 @@ class PantallaJuego : ComponentActivity() {
                                             }, 2000)
                                         }
 
-                                    else -> {
+                                        else -> {
+                                        }
                                     }
-                                }}
+                                }
                             }
                         }
                         Divider(
@@ -408,27 +552,32 @@ class PantallaJuego : ComponentActivity() {
                             // Boton para el país incorrecto
                             Button(
                                 onClick = {
-                                    if(cancelarMovimiento == true){
-                                    if (vidas > 1) {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Incorrecto :(",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        launchCountries()
-                                        Thread.sleep(1500)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                        this@PantallaJuego.vidas -= 1
-                                    } else {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Game Over",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        Thread.sleep(1500)
-                                        startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
-                                    }
+                                    if (cancelarMovimiento == true) {
+                                        if (vidas > 1) {
+                                            Toast.makeText(
+                                                this@PantallaJuego,
+                                                "Incorrecto :(",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            launchCountries()
+                                            Thread.sleep(1500)
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                            this@PantallaJuego.vidas -= 1
+                                        } else {
+                                            Toast.makeText(
+                                                this@PantallaJuego,
+                                                "Game Over",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            Thread.sleep(1500)
+                                            startActivity(
+                                                Intent(
+                                                    this@PantallaJuego,
+                                                    PantallaPrincipal::class.java
+                                                )
+                                            )
+                                        }
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
@@ -443,37 +592,42 @@ class PantallaJuego : ComponentActivity() {
                                     maxLines = 2,
                                     overflow = TextOverflow.Ellipsis,
                                 )
-                                if(cancelarMovimiento == false){
+                                if (cancelarMovimiento == false) {
 
-                                when (tiltDirection.value) {
-                                    TiltDirection.RIGHT -> {
-                                        if (vidas > 0) {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Incorrecto :(",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                    when (tiltDirection.value) {
+                                        TiltDirection.RIGHT -> {
+                                            if (vidas > 0) {
+                                                Toast.makeText(
+                                                    this@PantallaJuego,
+                                                    "Incorrecto :(",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
 
-                                            launchCountries()
-                                            Thread.sleep(1500)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                            this@PantallaJuego.vidas -= 1
-                                        } else {
-                                            Toast.makeText(
-                                                this@PantallaJuego,
-                                                "Game Over",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            Thread.sleep(1500)
-                                            startActivity(Intent(this@PantallaJuego, PantallaPrincipal::class.java))
+                                                launchCountries()
+                                                Thread.sleep(1500)
+                                                buttonIsVisible = true
+                                                capitalVisibility = false
+                                                this@PantallaJuego.vidas -= 1
+                                            } else {
+                                                Toast.makeText(
+                                                    this@PantallaJuego,
+                                                    "Game Over",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                Thread.sleep(1500)
+                                                startActivity(
+                                                    Intent(
+                                                        this@PantallaJuego,
+                                                        PantallaPrincipal::class.java
+                                                    )
+                                                )
+                                            }
+                                        }
+
+                                        else -> {
                                         }
                                     }
-
-                                    else -> {
-                                    }
                                 }
-                            }
                             }
                         }
                     }
@@ -498,57 +652,14 @@ class PantallaJuego : ComponentActivity() {
                         ) {
                             // Boton para el país incorrecto
                             Button(
-                                onClick = { if(cancelarMovimiento == true) {
-                                    if (vidas > 0) {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Incorrecto :(",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        launchCountries()
-                                        Thread.sleep(1500)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                        this@PantallaJuego.vidas -= 1
-                                    } else {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "Game Over",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        Thread.sleep(1500)
-                                        startActivity(
-                                            Intent(
-                                                this@PantallaJuego,
-                                                PantallaPrincipal::class.java
-                                            )
-                                        )
-                                    }
-                                }
-                                          },
-                                colors = ButtonDefaults.buttonColors(Color.Transparent)
-                            ) {
-                                Text(
-                                    text = incorrectCountryNameInGame,
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    fontSize = 23.sp,
-                                    color = Color.White,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                if(cancelarMovimiento == false){
-
-                                when (tiltDirection.value) {
-                                    TiltDirection.LEFT -> {
+                                onClick = {
+                                    if (cancelarMovimiento == true) {
                                         if (vidas > 0) {
                                             Toast.makeText(
                                                 this@PantallaJuego,
                                                 "Incorrecto :(",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-
                                             launchCountries()
                                             Thread.sleep(1500)
                                             buttonIsVisible = true
@@ -569,10 +680,54 @@ class PantallaJuego : ComponentActivity() {
                                             )
                                         }
                                     }
+                                },
+                                colors = ButtonDefaults.buttonColors(Color.Transparent)
+                            ) {
+                                Text(
+                                    text = incorrectCountryNameInGame,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    fontSize = 23.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                if (cancelarMovimiento == false) {
 
-                                    else -> {
+                                    when (tiltDirection.value) {
+                                        TiltDirection.LEFT -> {
+                                            if (vidas > 0) {
+                                                Toast.makeText(
+                                                    this@PantallaJuego,
+                                                    "Incorrecto :(",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                                launchCountries()
+                                                Thread.sleep(1500)
+                                                buttonIsVisible = true
+                                                capitalVisibility = false
+                                                this@PantallaJuego.vidas -= 1
+                                            } else {
+                                                Toast.makeText(
+                                                    this@PantallaJuego,
+                                                    "Game Over",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                Thread.sleep(1500)
+                                                startActivity(
+                                                    Intent(
+                                                        this@PantallaJuego,
+                                                        PantallaPrincipal::class.java
+                                                    )
+                                                )
+                                            }
+                                        }
+
+                                        else -> {
+                                        }
                                     }
-                                }
                                 }
 
                             }
@@ -593,35 +748,40 @@ class PantallaJuego : ComponentActivity() {
                         ) {
                             // Boton para el país correcto
                             Button(
-                                onClick = { if(cancelarMovimiento == true) {
-                                    Toast.makeText(
-                                        this@PantallaJuego,
-                                        "¡Correcto!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    puntos +=10
-                                    val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-                                        .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
-                                        .setCancelable(false)
-                                        .create()
-                                    progressDialog.window?.setBackgroundDrawable(
-                                        ColorDrawable(
-                                            android.graphics.Color.TRANSPARENT
+                                onClick = {
+                                    if (cancelarMovimiento == true) {
+                                        Toast.makeText(
+                                            this@PantallaJuego,
+                                            "¡Correcto!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        puntos += 10
+                                        val progressDialog =
+                                            AlertDialog.Builder(this@PantallaJuego)
+                                                .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
+                                                .setCancelable(false)
+                                                .create()
+                                        progressDialog.window?.setBackgroundDrawable(
+                                            ColorDrawable(
+                                                android.graphics.Color.TRANSPARENT
+                                            )
                                         )
-                                    )
 
-                                    progressDialog.show()
+                                        progressDialog.show()
 
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        progressDialog.dismiss()
-                                        intent.putExtra("puntos", puntos)
-                                        intent.putExtra("cancelarMovimiento", cancelarMovimiento)
-                                        startActivity(intent)
-                                        buttonIsVisible = true
-                                        capitalVisibility = false
-                                    }, 2000)
-                                }
-                                          },
+                                        Handler(Looper.getMainLooper()).postDelayed({
+                                            progressDialog.dismiss()
+                                            intent.putExtra("puntos", puntos)
+                                            intent.putExtra(
+                                                "cancelarMovimiento",
+                                                cancelarMovimiento
+                                            )
+                                            startActivity(intent)
+                                            buttonIsVisible = true
+                                            capitalVisibility = false
+                                        }, 2000)
+                                    }
+                                },
                                 colors = ButtonDefaults.buttonColors(Color.Transparent)
                             ) {
                                 Text(
@@ -634,37 +794,43 @@ class PantallaJuego : ComponentActivity() {
                                     maxLines = 2,
                                     overflow = TextOverflow.Ellipsis,
                                 )
-                                if(cancelarMovimiento == false){
+                                if (cancelarMovimiento == false) {
 
-                                when (tiltDirection.value) {
-                                    TiltDirection.RIGHT -> {
-                                        Toast.makeText(
-                                            this@PantallaJuego,
-                                            "¡Correcto!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        puntos +=10
-                                        val progressDialog = AlertDialog.Builder(this@PantallaJuego)
-                                            .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
-                                            .setCancelable(false)
-                                            .create()
-                                        progressDialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+                                    when (tiltDirection.value) {
+                                        TiltDirection.RIGHT -> {
+                                            Toast.makeText(
+                                                this@PantallaJuego,
+                                                "¡Correcto!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            puntos += 10
+                                            val progressDialog =
+                                                AlertDialog.Builder(this@PantallaJuego)
+                                                    .setView(R.layout.layout_loading) // Reemplaza "dialog_loading" con el layout personalizado para la animación de carga
+                                                    .setCancelable(false)
+                                                    .create()
+                                            progressDialog.window?.setBackgroundDrawable(
+                                                ColorDrawable(android.graphics.Color.TRANSPARENT)
+                                            )
 
-                                        progressDialog.show()
-    
-                                        Handler(Looper.getMainLooper()).postDelayed({
-                                            progressDialog.dismiss()
-                                            intent.putExtra("puntos", puntos)
-                                            intent.putExtra("cancelarMovimiento",cancelarMovimiento)
-                                            startActivity(intent)
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
-                                        }, 2000)
+                                            progressDialog.show()
+
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                progressDialog.dismiss()
+                                                intent.putExtra("puntos", puntos)
+                                                intent.putExtra(
+                                                    "cancelarMovimiento",
+                                                    cancelarMovimiento
+                                                )
+                                                startActivity(intent)
+                                                buttonIsVisible = true
+                                                capitalVisibility = false
+                                            }, 2000)
+                                        }
+
+                                        else -> {
+                                        }
                                     }
-
-                                    else -> {
-                                    }
-                                }
                                 }
                             }
                         }
@@ -708,9 +874,10 @@ class PantallaJuego : ComponentActivity() {
             ) {
                 Button(
                     onClick = {
-                        buttonIsVisible = !buttonIsVisible; capitalVisibility = !capitalVisibility
+                        buttonIsVisible = !buttonIsVisible; capitalVisibility =
+                        !capitalVisibility
                     },
-                    modifier = Modifier.padding(top = 30.dp),
+                    modifier = Modifier.padding(top = 25.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFF335ABD))
                 ) {
                     Text(text = "Ayuda", style = MaterialTheme.typography.bodyMedium)
@@ -718,6 +885,7 @@ class PantallaJuego : ComponentActivity() {
             }
         }
     }
+
     @Composable
     fun TopBar() {
 
@@ -725,17 +893,21 @@ class PantallaJuego : ComponentActivity() {
             title = { Text(text = "", modifier = Modifier, Color.White) },
             backgroundColor = Color.Black,
             actions = {
-                IconButton(onClick = { this@PantallaJuego.cancelarMovimiento =! this@PantallaJuego.cancelarMovimiento})
+                IconButton(onClick = {
+                    this@PantallaJuego.cancelarMovimiento =
+                        !this@PantallaJuego.cancelarMovimiento
+                })
                 {
-                    if(!cancelarMovimiento) {
+                    if (!cancelarMovimiento) {
                         Image(
                             painter = painterResource(id = R.drawable.movimiento_on),
                             contentDescription = "movimiento ok"
                         )
-                    }else{ Image(
-                        painter = painterResource(id = R.drawable.movimento_of),
-                        contentDescription = "movimiento of"
-                    )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.movimento_of),
+                            contentDescription = "movimiento of"
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.width(130.dp))
