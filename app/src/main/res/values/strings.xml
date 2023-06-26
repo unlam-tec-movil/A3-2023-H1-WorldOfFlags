@@ -17,4 +17,5 @@
     <string name="title_activity_pantalla_scanear_qr">PantallaScanearQr</string>
     <string name="title_activity_pantalla_juego_versus">PantallaJuegoVersus</string>
     <string name="title_activity_pantalla_crear_usuario">PantallaCrearUsuario</string>
+    <string name="title_activity_pantalla_fin_juego_versus">PantallaFinJuegoVersus</string>
 </resources>
