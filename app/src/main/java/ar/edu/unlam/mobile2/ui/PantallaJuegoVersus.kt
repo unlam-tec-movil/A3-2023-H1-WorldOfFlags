@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 
 import androidx.compose.animation.AnimatedVisibility
@@ -32,7 +31,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -98,6 +96,7 @@ class PantallaJuegoVersus : ComponentActivity() {
     private var puntos :Int =0
     private var paisesAcertados: Int =0
     private var cancelarMovimiento by mutableStateOf(true)
+    private var errado by mutableStateOf(false)
     private var acertado by mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -214,6 +213,9 @@ class PantallaJuegoVersus : ComponentActivity() {
             ShowCapital(correctCountryCapitalInGame)
         }
         CountriErrorAnimation(Modifier.drawWithContent {
+            drawContent()
+        })
+        CountriOkAnimation(Modifier.drawWithContent {
             drawContent()
         })
     }
@@ -335,17 +337,15 @@ class PantallaJuegoVersus : ComponentActivity() {
                             // Boton para el país correcto
                             Button(
                                 onClick = {if(cancelarMovimiento == true) {
-                                    Toast.makeText(
-                                        this@PantallaJuegoVersus,
-                                        "¡Correcto!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                   acertado=true
                                     paisesAcertados+=1
                                     puntos+=10
                                     intent.putExtra("paisesAcertados",paisesAcertados)
                                     intent.putExtra("puntos", puntos)
-                                    startActivity(intent)
-                                    Thread.sleep(2000)
+                                    lifecycleScope.launch {
+                                        delay(2000)
+                                        startActivity(intent)
+                                    }
                                     buttonIsVisible = true
                                     capitalVisibility = false
                                 }},
@@ -364,21 +364,18 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 if(cancelarMovimiento == false) {
                                     when (tiltDirection.value) {
                                         TiltDirection.LEFT -> {
-                                            Toast.makeText(
-                                                this@PantallaJuegoVersus,
-                                                "¡Izquierda Correcto!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            acertado=true
                                             paisesAcertados+=1
                                             puntos+=10
-                                            Thread.sleep(2000)
                                             intent.putExtra("paisesAcertados",paisesAcertados)
                                             intent.putExtra("puntos", puntos)
-                                            startActivity(intent)
+                                            lifecycleScope.launch {
+                                                delay(2000)
+                                                startActivity(intent)
+                                            }
                                             buttonIsVisible = true
                                             capitalVisibility = false
                                         }
-
                                         else -> {
                                         }
                                     }
@@ -402,7 +399,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                             // Boton para el país incorrecto
                             Button(
                                 onClick = {if(cancelarMovimiento == true) {
-                                    acertado = true
+                                    errado = true
                                     lifecycleScope.launch {
                                         delay(2000)
                                         launchCountries()
@@ -424,9 +421,8 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 )
                                 if(cancelarMovimiento == false){
                                 when (tiltDirection.value) {
-
                                     TiltDirection.RIGHT -> {
-                                        acertado = true
+                                        errado = true
                                         lifecycleScope.launch {
                                             delay(2000)
                                             launchCountries()
@@ -434,7 +430,6 @@ class PantallaJuegoVersus : ComponentActivity() {
                                         buttonIsVisible = true
                                         capitalVisibility = false
                                     }
-
                                     else -> {
                                     }
                                 }
@@ -464,7 +459,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                             // Boton para el país incorrecto
                             Button(
                                 onClick = {if(cancelarMovimiento == true) {
-                                    acertado = true
+                                    errado = true
                                     lifecycleScope.launch {
                                         delay(2000)
                                         launchCountries()
@@ -487,7 +482,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 if(cancelarMovimiento == false) {
                                     when (tiltDirection.value) {
                                         TiltDirection.LEFT -> {
-                                            acertado = true
+                                            errado = true
                                             lifecycleScope.launch {
                                                 delay(2000)
                                                 launchCountries()
@@ -495,7 +490,6 @@ class PantallaJuegoVersus : ComponentActivity() {
                                             buttonIsVisible = true
                                             capitalVisibility = false
                                         }
-
                                         else -> {
                                         }
                                     }
@@ -519,17 +513,15 @@ class PantallaJuegoVersus : ComponentActivity() {
                             // Boton para el país correcto
                             Button(
                                 onClick = {if(cancelarMovimiento == true) {
-                                    Toast.makeText(
-                                        this@PantallaJuegoVersus,
-                                        "¡Correcto!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    acertado=true
                                     paisesAcertados+=1
                                     puntos+=10
                                     intent.putExtra("paisesAcertados",paisesAcertados)
                                     intent.putExtra("puntos", puntos)
-                                    startActivity(intent)
-                                    Thread.sleep(1500)
+                                    lifecycleScope.launch {
+                                        delay(2000)
+                                        startActivity(intent)
+                                    }
                                     buttonIsVisible = true
                                     capitalVisibility = false
                                 }},
@@ -548,21 +540,18 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 if(cancelarMovimiento == false){
                                 when (tiltDirection.value) {
                                     TiltDirection.RIGHT -> {
-                                        Toast.makeText(
-                                            this@PantallaJuegoVersus,
-                                            "¡Derecha Correcto!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        acertado=true
                                         paisesAcertados+=1
                                         puntos+=10
                                         intent.putExtra("paisesAcertados",paisesAcertados)
                                         intent.putExtra("puntos", puntos)
-                                        startActivity(intent)
-                                        Thread.sleep(1500)
+                                        lifecycleScope.launch {
+                                            delay(2000)
+                                            startActivity(intent)
+                                        }
                                         buttonIsVisible = true
                                         capitalVisibility = false
                                     }
-
                                     else -> {
                                     }
                                 }
@@ -622,16 +611,16 @@ class PantallaJuegoVersus : ComponentActivity() {
     @Composable
     fun CountriErrorAnimation(modifier:Modifier) {
         val scope = rememberCoroutineScope()
-        LaunchedEffect(acertado) {
-            if (acertado) {
+        LaunchedEffect(errado) {
+            if (errado) {
                 scope.launch {
                     delay(2000)
-                    acertado = false
+                    errado = false
                 }
             }
         }
         AnimatedVisibility(
-            acertado,enter = fadeIn() + slideInVertically(),
+            errado,enter = fadeIn() + slideInVertically(),
             exit = fadeOut() + slideOutVertically(),
 
             ) {
@@ -640,37 +629,48 @@ class PantallaJuegoVersus : ComponentActivity() {
                 .background(Color.Transparent), Alignment.BottomCenter
             ) {
                 Column() {
-
-                    Image(painterResource(id = R.drawable.errornuevo),
+                    Image(painterResource(id = R.drawable.paisenojado1),
                         modifier=Modifier.align(Alignment.CenterHorizontally),
                         contentDescription = "")
-                    Text(
-                        text = "incorrecto",
-                        fontSize = 50.sp,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color(0xFFF00F2A)
-                    )
                 }
 
             }
         }
 
     }
-
+    @Composable
+    fun CountriOkAnimation(modifier:Modifier) {
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(acertado) {
+            if (acertado) {
+                scope.launch {
+                    delay(1500)
+                    acertado = false
+                }
+            }
+        }
+        AnimatedVisibility(
+            acertado,enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically(),
+        ) {
+            Box( modifier = Modifier
+                .size(450.dp)
+                .background(Color.Transparent), Alignment.BottomCenter
+            ) {
+                Column() {
+                    Image(painterResource(id = R.drawable.paiscontento),
+                        modifier=Modifier.align(Alignment.CenterHorizontally),
+                        contentDescription = "")
+                }
+            }
+        }
+    }
     @Composable
     fun TopBar() {
 
         TopAppBar(
             title = {
-                if (!cancelarMovimiento) {
-                    Text(text = "Desactivar Movimiento ->", modifier = Modifier, Color(
-                        0xFF396AE9
-                    )
-                    )
-                }else{
-                    Text(text = "Activar Movimiento    ->", modifier = Modifier, Color( 0xFF396AE9))
-                }
-            },
+                    Text(text = "", modifier = Modifier,Color(0xFF396AE9 ))},
             backgroundColor = Color.Black,
             actions = {
                 IconButton(onClick = { this@PantallaJuegoVersus.cancelarMovimiento =! this@PantallaJuegoVersus.cancelarMovimiento})
