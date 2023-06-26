@@ -16,10 +16,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,54 +44,75 @@ class PantallaVersus : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun pantallaInicio(scaffoldState: ScaffoldState) {
-        Scaffold(
-            scaffoldState = scaffoldState,
-            topBar = { topBarVersus() },
-        ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+        )
+        {
+            Image(
+                painter = painterResource(id = R.drawable.fondo_2),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            topBarVersus()
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-            )
-
-            {
-                Spacer(modifier = Modifier.padding(100.dp))
-                ScanearQR(Modifier.align(Alignment.CenterHorizontally))
-                Spacer(modifier = Modifier.padding(100.dp))
-                MostrarQR(Modifier.align(Alignment.CenterHorizontally))
-
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 20.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ScanearQR()
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 30.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    MostrarQR()
+                }
             }
         }
     }
 
 
     @Composable
-    fun ScanearQR(modifier: Modifier) {
-        Button(
-            modifier = modifier
-                .height(50.dp)
-                .width(180.dp),
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
-            onClick = { startActivity(Intent(this@PantallaVersus, PantallaScanearQr::class.java))
-            }) {
-            Text(text = "Scanear QR")
+    fun ScanearQR() {
+        androidx.compose.material3.Button(
+            onClick = { startActivity(Intent(this@PantallaVersus, PantallaScanearQr::class.java)) },
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.escanear),
+                contentDescription = "imagenPista",
+                modifier = Modifier
+                    .size(120.dp)
+            )
         }
     }
     @Composable
-    fun MostrarQR(modifier: Modifier) {
-        Button(
-            modifier = modifier
-                .height(50.dp)
-                .width(180.dp),
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
+    fun MostrarQR() {
+        androidx.compose.material3.Button(
             onClick = {
                 startActivity(Intent(this@PantallaVersus, PantallaQR::class.java))
                 finish()
-            }) {
-            Text(text = "Mostrar QR")
-
+            },
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.generar),
+                contentDescription = "imagenPista",
+                modifier = Modifier
+                    .size(120.dp),
+            )
         }
     }
     @Composable
@@ -99,8 +122,8 @@ class PantallaVersus : ComponentActivity() {
             mutableStateOf(false)
         }
         TopAppBar(
-            title = { Text(text = "                        Partida Versus", modifier = Modifier, Color.White) },
-            backgroundColor = Color.Black,
+            title = { Text(text = "", modifier = Modifier, Color.White) },
+            backgroundColor = Color.Transparent,
             actions = {
                 IconButton(onClick = {   startActivity(Intent(this@PantallaVersus,
                     MainActivity::class.java))

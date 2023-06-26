@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -30,10 +32,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import ar.edu.unlam.mobile2.R
 import ar.edu.unlam.mobile2.ui.ViewModel.MapViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -139,10 +144,15 @@ class PantallaMapa : ComponentActivity() {
         intent.putExtra("cancelarMovimiento",cancelarMovimiento)
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
+                .fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.fondo_qr),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -155,17 +165,21 @@ class PantallaMapa : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.padding(15.dp))
                 Button(
+                    onClick = {
+                        startActivity(intent)
+                    },
                     modifier = Modifier
                         .height(50.dp)
                         .width(500.dp),
                     shape = RoundedCornerShape(50),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color(0xFF396AE9)),
-
-                    onClick = {
-                        startActivity(intent)
-                    }
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
                 ) {
-                    Text(text = "Siguiente")
+                    Image(
+                        painter = painterResource(id = R.drawable.siguiente),
+                        contentDescription = "imagenPista",
+                        modifier = Modifier
+                            .size(120.dp),
+                    )
                 }
             }
         }

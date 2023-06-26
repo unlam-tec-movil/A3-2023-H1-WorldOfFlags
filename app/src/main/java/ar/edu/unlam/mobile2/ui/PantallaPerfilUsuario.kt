@@ -101,68 +101,78 @@ class PantallaPerfilUsuario : ComponentActivity() {
             scaffoldState = scaffoldState,
             topBar = { topBarPerfil() },
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black)
             ) {
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(14.dp))
-                }
-                nombreRegistro(
-                    Modifier.align(CenterHorizontally),
-                    nombre
+                Image(
+                    painter = painterResource(id = R.drawable.fondo_qr),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-                email(Modifier.align(CenterHorizontally), email)
-
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-                nacionalidad(
-                    Modifier.align(CenterHorizontally),
-                    nacionalidad
-                )
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-                if (userViewModel.getAllUserDatabase().isEmpty()) {
-                    tomarFoto(Modifier.align(CenterHorizontally))
-                }
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(10.dp))
-                }
-                fotoPerfil(
-                    imagenFoto,
-                    Modifier
-                        .align(CenterHorizontally)
-                        .clip(CircleShape)
-                )
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(10.dp))
-                }
-                if (userViewModel.getAllUserDatabase().isEmpty()) {
-                    botonGuardarCambios(
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(14.dp))
+                    }
+                    nombreRegistro(
                         Modifier.align(CenterHorizontally),
-                        nombre,
-                        email,
-                        nacionalidad,
-                        imagenFoto
+                        nombre
                     )
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                    email(Modifier.align(CenterHorizontally), email)
+                
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                    nacionalidad(
+                        Modifier.align(CenterHorizontally),
+                        nacionalidad
+                    )
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                    if (userViewModel.getAllUserDatabase().isEmpty()) {
+                        tomarFoto(Modifier.align(CenterHorizontally))
+                    }
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(10.dp))
+                    }
+                    fotoPerfil(
+                        imagenFoto,
+                        Modifier
+                            .align(CenterHorizontally)
+                            .clip(CircleShape)
+                    )
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(10.dp))
+                    }
+                    if (userViewModel.getAllUserDatabase().isEmpty()) {
+                        botonGuardarCambios(
+                            Modifier.align(CenterHorizontally),
+                            nombre,
+                            email,
+                            nacionalidad,
+                            imagenFoto
+                        )
+                    }
                 }
             }
         }
