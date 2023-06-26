@@ -13,14 +13,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedContent
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,8 +66,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
@@ -199,10 +209,88 @@ class PantallaJuegoVersus : ComponentActivity() {
                 tiltDirection, latitudeCorrectCountryGame,
                 longitudeCorrectCountryGame
             )
-            Spacer(modifier = Modifier.padding(65.dp))
+            Spacer(modifier = Modifier.padding(25.dp))
+            ExpandableContent()
+            Spacer(modifier = Modifier.padding(15.dp))
             ShowCapital(correctCountryCapitalInGame)
         }
     }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Composable
+    fun ExpandableContent() {
+        var expanded by remember { mutableStateOf(false) }
+
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier
+                .clickable { expanded = !expanded }
+                .padding(16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            AnimatedContent(
+                targetState = expanded,
+                transitionSpec = {
+                    fadeIn(
+                        animationSpec = tween(
+                            400,
+                            250
+                        )
+                    ) with fadeOut(animationSpec = tween(400)) using
+                            SizeTransform { initialSize, targetSize ->
+                                if (targetState) {
+                                    keyframes {
+                                        IntSize(
+                                            targetSize.width,
+                                            initialSize.height
+                                        ) at 320
+                                        durationMillis = 250
+                                    }
+                                } else {
+                                    keyframes {
+                                        IntSize(initialSize.width, targetSize.height) at 320
+                                        durationMillis = 250
+                                    }
+                                }
+                            }
+                }
+            ) { targetExpanded ->
+                if (targetExpanded) {
+                    optionRotation()
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.aiuda),
+                        contentDescription = "Ayuda",
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun optionRotation() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.background(Color(0xFF02A4A6))
+
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.rotacelu),
+                contentDescription = "Imagen",
+                modifier = Modifier.size(40.dp)
+            )
+            Text(
+                text = "Rote el dispositivo en dirección a la opción correcta, para desactivar esta funcionalidad, apriete el botón que se encuentra en la parte superior.",
+                style = TextStyle(fontSize = 18.sp),
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .weight(1f)
+            )
+        }
+    }
+
 
     @Composable
     fun TopBlock(flag: String, nameUser: String, nationalityUser: String, imagenUser: ByteArray?) {

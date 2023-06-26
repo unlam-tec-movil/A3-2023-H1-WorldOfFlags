@@ -202,9 +202,9 @@ class PantallaJuego : ComponentActivity() {
                 tiltDirection, latitudeCorrectCountryGame,
                 longitudeCorrectCountryGame
             )
-            Spacer(modifier = Modifier.padding(15.dp))
+            Spacer(modifier = Modifier.padding(25.dp))
             ExpandableContent()
-            Spacer(modifier = Modifier.padding(5.dp))
+            Spacer(modifier = Modifier.padding(15.dp))
             ShowCapital(correctCountryCapitalInGame)
 
         }
@@ -242,34 +242,47 @@ class PantallaJuego : ComponentActivity() {
                 transitionSpec = {
                     fadeIn(
                         animationSpec = tween(
-                            750,
-                            300
+                            400,
+                            250
                         )
-                    ) with fadeOut(animationSpec = tween(750)) using
+                    ) with fadeOut(animationSpec = tween(400)) using
                             SizeTransform { initialSize, targetSize ->
                                 if (targetState) {
                                     keyframes {
                                         IntSize(
                                             targetSize.width,
                                             initialSize.height
-                                        ) at 400
-                                        durationMillis = 750
+                                        ) at 320
+                                        durationMillis = 250
                                     }
                                 } else {
                                     keyframes {
-                                        IntSize(initialSize.width, targetSize.height) at 400
-                                        durationMillis = 750
+                                        IntSize(initialSize.width, targetSize.height) at 320
+                                        durationMillis = 250
                                     }
                                 }
                             }
                 }
             ) { targetExpanded ->
                 if (targetExpanded) {
-                    Column() {
-                        optionRotation()
-                        optionClick()
-                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.background(Color(0xFF02A4A6))
 
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.rotacelu),
+                            contentDescription = "Imagen",
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Text(
+                            text = "Rote el dispositivo en dirección a la opción correcta, para desactivar esta funcionalidad, apriete el botón que se encuentra en la parte superior.",
+                            style = TextStyle(fontSize = 18.sp),
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f)
+                        )
+                    }
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.aiuda),
@@ -278,6 +291,28 @@ class PantallaJuego : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun optionRotation() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.background(Color(0xFF02A4A6))
+
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.rotacelu),
+                contentDescription = "Imagen",
+                modifier = Modifier.size(40.dp)
+            )
+            Text(
+                text = "Rote el dispositivo en dirección a la opción correcta, para desactivar esta funcionalidad, apriete el botón que se encuentra en la parte superior.",
+                style = TextStyle(fontSize = 18.sp),
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .weight(1f)
+            )
         }
     }
 
@@ -297,30 +332,6 @@ class PantallaJuego : ComponentActivity() {
             Text(
                 text = "Presione la opcion correcta",
                 style = TextStyle(fontSize = 18.sp),
-                color = Color.White,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .weight(1f)
-            )
-        }
-    }
-
-    @Composable
-    private fun optionRotation() {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.background(Color.Gray)
-
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.rotacelu),
-                contentDescription = "Imagen",
-                modifier = Modifier.size(40.dp)
-            )
-            Text(
-                text = "Rote el dispositivo en dirección a la opción correcta",
-                style = TextStyle(fontSize = 18.sp),
-                color = Color.White,
                 modifier = Modifier
                     .padding(start = 8.dp)
                     .weight(1f)
