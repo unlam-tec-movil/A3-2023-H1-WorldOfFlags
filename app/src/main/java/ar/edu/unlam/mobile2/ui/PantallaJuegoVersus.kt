@@ -13,6 +13,7 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 
 import androidx.compose.animation.AnimatedVisibility
@@ -31,6 +32,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -167,8 +169,9 @@ class PantallaJuegoVersus : ComponentActivity() {
             intent.putExtra("puntos", puntos)
             startActivity(intent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
         }
-    }
+
 
     @Composable
     fun PrincipalScreen(
