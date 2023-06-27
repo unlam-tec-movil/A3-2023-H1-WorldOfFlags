@@ -13,12 +13,15 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,10 +29,12 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.with
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +42,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -79,6 +85,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
@@ -217,6 +224,8 @@ class PantallaJuego : ComponentActivity() {
                         Column(modifier = Modifier.fillMaxSize()) {
                             TopBlock(modifier = Modifier.weight(0.5f), flag, nameUser, nacionalityUser, imageUser)
                             BottomBlock(modifier = Modifier.weight(0.25f), correctCountryNameInGame, incorrectCountryNameInGame, tiltDirection, latitudeCorrectCountryGame, longitudeCorrectCountryGame)
+                            Spacer(modifier = Modifier.height(55.dp))
+                            ExpandableContent()
                         }
                     }
                     ShowCapital(modifier = Modifier.weight(0.25f), correctCountryCapitalInGame)
@@ -227,6 +236,76 @@ class PantallaJuego : ComponentActivity() {
                 CountryOkAnimation(Modifier.drawWithContent {
                     drawContent()
                 })
+            }
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Composable
+    fun ExpandableContent() {
+        var expanded by remember { mutableStateOf(false) }
+
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier
+                .clickable { expanded = !expanded }
+                .padding(16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            AnimatedContent(
+                targetState = expanded,
+                transitionSpec = {
+                    fadeIn(
+                        animationSpec = tween(
+                            400,
+                            250
+                        )
+                    ) with fadeOut(animationSpec = tween(400)) using
+                            SizeTransform { initialSize, targetSize ->
+                                if (targetState) {
+                                    keyframes {
+                                        IntSize(
+                                            targetSize.width,
+                                            initialSize.height
+                                        ) at 320
+                                        durationMillis = 250
+                                    }
+                                } else {
+                                    keyframes {
+                                        IntSize(initialSize.width, targetSize.height) at 320
+                                        durationMillis = 250
+                                    }
+                                }
+                            }
+                }
+            ) { targetExpanded ->
+                if (targetExpanded) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.background(Color(0xFF02A4A6))
+
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.rotarcelu),
+                            contentDescription = "Imagen",
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Text(
+                            text = "Rote el dispositivo en dirección a la opción correcta, para desactivar esta funcionalidad, apriete el botón que se encuentra en la parte superior.",
+                            style = TextStyle(fontSize = 18.sp),
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f)
+                        )
+                    }
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.ayuda),
+                        contentDescription = "Ayuda",
+                        modifier = Modifier.size(45.dp)
+                    )
+                }
             }
         }
     }
