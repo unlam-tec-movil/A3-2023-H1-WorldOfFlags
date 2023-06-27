@@ -109,7 +109,7 @@ class PantallaFinJuegoVersus : ComponentActivity() {
 	@Composable
 	fun ImagenLogo() {
 		Image(
-			painter = painterResource(id = R.drawable.mundo),
+			painter = painterResource(id = R.drawable.puntaje_final),
 			contentDescription = "imagen logo",
 			modifier = Modifier
 				.fillMaxWidth()

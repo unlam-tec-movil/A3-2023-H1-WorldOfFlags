@@ -19,8 +19,12 @@ import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,17 +51,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -80,6 +89,7 @@ import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,6 +107,8 @@ class PantallaJuegoVersus : ComponentActivity() {
     private var puntos :Int =0
     private var paisesAcertados: Int =0
     private var cancelarMovimiento by mutableStateOf(true)
+    private var errado by mutableStateOf(false)
+    private var acertado by mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -206,6 +218,12 @@ class PantallaJuegoVersus : ComponentActivity() {
                 }
                 ShowCapital(modifier = Modifier.weight(0.25f), correctCountryCapitalInGame)
             }
+            CountryErrorAnimation(Modifier.drawWithContent {
+                drawContent()
+            })
+            CountryOkAnimation(Modifier.drawWithContent {
+                drawContent()
+            })
         }
     }
 
@@ -361,11 +379,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            Toast.makeText(
-                                                this@PantallaJuegoVersus,
-                                                "¡Correcto!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            acertado=true
                                             paisesAcertados+=1
                                             puntos += 10
                                             val progressDialog =
@@ -404,11 +418,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                                     
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
-                                                Toast.makeText(
-                                                    this@PantallaJuegoVersus,
-                                                    "¡Correcto!",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                                acertado = true
                                                 paisesAcertados+=1
                                                 puntos += 10
                                                 val progressDialog =
@@ -462,13 +472,11 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            Toast.makeText(
-                                                this@PantallaJuegoVersus,
-                                                "Incorrecto :(",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            launchCountries()
-                                            Thread.sleep(1500)
+                                            errado = true
+                                            lifecycleScope.launch {
+                                                delay(2000)
+                                                launchCountries()
+                                            }
                                             buttonIsVisible = true
                                             capitalVisibility = false
                                         }
@@ -486,14 +494,11 @@ class PantallaJuegoVersus : ComponentActivity() {
                                     
                                         when (tiltDirection.value) {
                                             TiltDirection.RIGHT -> {
-                                                Toast.makeText(
-                                                    this@PantallaJuegoVersus,
-                                                    "Incorrecto :(",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            
-                                                launchCountries()
-                                                Thread.sleep(1500)
+                                                errado = true
+                                                lifecycleScope.launch {
+                                                    delay(2000)
+                                                    launchCountries()
+                                                }
                                                 buttonIsVisible = true
                                                 capitalVisibility = false
                                             }
@@ -538,13 +543,11 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            Toast.makeText(
-                                                this@PantallaJuegoVersus,
-                                                "Incorrecto :(",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            launchCountries()
-                                            Thread.sleep(1500)
+                                            errado = true
+                                            lifecycleScope.launch {
+                                                delay(2000)
+                                                launchCountries()
+                                            }
                                             buttonIsVisible = true
                                             capitalVisibility = false
                                         }
@@ -562,13 +565,11 @@ class PantallaJuegoVersus : ComponentActivity() {
                                     
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
-                                                Toast.makeText(
-                                                    this@PantallaJuegoVersus,
-                                                    "Incorrecto :(",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                                launchCountries()
-                                                Thread.sleep(1500)
+                                                errado = true
+                                                lifecycleScope.launch {
+                                                    delay(2000)
+                                                    launchCountries()
+                                                }
                                                 buttonIsVisible = true
                                                 capitalVisibility = false
                                             }
@@ -598,11 +599,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            Toast.makeText(
-                                                this@PantallaJuegoVersus,
-                                                "¡Correcto!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            acertado = true
                                             paisesAcertados+=1
                                             puntos += 10
                                             val progressDialog =
@@ -645,11 +642,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                                     
                                         when (tiltDirection.value) {
                                             TiltDirection.RIGHT -> {
-                                                Toast.makeText(
-                                                    this@PantallaJuegoVersus,
-                                                    "¡Correcto!",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                                acertado = true
                                                 paisesAcertados+=1
                                                 puntos += 10
                                                 val progressDialog =
@@ -743,7 +736,7 @@ class PantallaJuegoVersus : ComponentActivity() {
     fun TopBar() {
 
         TopAppBar(
-            title = { Text(text = "", modifier = Modifier, Color.White) },
+            title = {Text(text = "", modifier = Modifier, Color(0xFF396AE9))},
             backgroundColor = Color.Transparent,
             actions = {
                 IconButton(onClick = { this@PantallaJuegoVersus.cancelarMovimiento =! this@PantallaJuegoVersus.cancelarMovimiento})
@@ -778,6 +771,62 @@ class PantallaJuegoVersus : ComponentActivity() {
                 }
             }
         )
+    }
+    
+    @Composable
+    fun CountryErrorAnimation(modifier:Modifier) {
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(errado) {
+            if (errado) {
+                scope.launch {
+                    delay(2000)
+                    errado = false
+                }
+            }
+        }
+        AnimatedVisibility(
+            errado,enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically(),
+            
+            ) {
+            Box( modifier = Modifier
+                .size(450.dp)
+                .background(Color.Transparent), Alignment.BottomCenter
+            ) {
+                Column() {
+                    Image(painterResource(id = R.drawable.pais_incorrecto),
+                        modifier=Modifier.align(Alignment.CenterHorizontally),
+                        contentDescription = "")
+                }
+            }
+        }
+    }
+    
+    @Composable
+    fun CountryOkAnimation(modifier:Modifier) {
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(acertado) {
+            if (acertado) {
+                scope.launch {
+                    delay(1500)
+                    acertado = false
+                }
+            }
+        }
+        AnimatedVisibility(
+            acertado,enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically(),
+        ) {
+            Box( modifier = Modifier
+                .size(450.dp)
+                .background(Color.Transparent), BottomCenter ) {
+                Column() {
+                    Image(painterResource(id = R.drawable.pais_correcto),
+                        modifier=Modifier.align(CenterHorizontally),
+                        contentDescription = "")
+                }
+            }
+        }
     }
 }
 
