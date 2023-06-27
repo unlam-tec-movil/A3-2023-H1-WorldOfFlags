@@ -110,6 +110,7 @@ class PantallaJuego : ComponentActivity() {
     private var errado by mutableStateOf(false)
     private var acertado by mutableStateOf(false)
   
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     
@@ -411,7 +412,6 @@ class PantallaJuego : ComponentActivity() {
                                         textAlign = TextAlign.Center,
                                     )
                                     if (cancelarMovimiento == false) {
-                                
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
                                                 acertado=true
@@ -424,9 +424,7 @@ class PantallaJuego : ComponentActivity() {
                                                 progressDialog.window?.setBackgroundDrawable(
                                                     ColorDrawable(android.graphics.Color.TRANSPARENT)
                                                 )
-                                        
                                                 progressDialog.show()
-                                        
                                                 Handler(Looper.getMainLooper()).postDelayed({
                                                     progressDialog.dismiss()
                                                     intent.putExtra("puntos", puntos)
@@ -439,7 +437,6 @@ class PantallaJuego : ComponentActivity() {
                                                     capitalVisibility = false
                                                 }, 2000)
                                             }
-                                    
                                             else -> {
                                             }
                                         }
@@ -486,7 +483,6 @@ class PantallaJuego : ComponentActivity() {
                                         textAlign = TextAlign.Center,
                                     )
                                     if (cancelarMovimiento == false) {
-                                
                                         when (tiltDirection.value) {
                                             TiltDirection.RIGHT -> {
                                                 errado = true
@@ -558,7 +554,6 @@ class PantallaJuego : ComponentActivity() {
                                         textAlign = TextAlign.Center,
                                     )
                                     if (cancelarMovimiento == false) {
-                                
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
                                                 errado = true
