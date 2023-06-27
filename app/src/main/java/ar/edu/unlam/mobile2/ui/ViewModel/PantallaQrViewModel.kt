@@ -37,7 +37,7 @@ class PantallaQrViewModel @Inject constructor(private val service: CountriesServ
         Log.i("PantallaQRViewModel", "Estoy generando el contenido")
         val contentBuilder = StringBuilder()
         val countriesList = service.getCountry()
-        val randomCountries = countriesList?.shuffled()?.take(1)
+        val randomCountries = countriesList?.shuffled()?.take(15)
         if (randomCountries != null) {
             for (country in randomCountries){
                 contentBuilder.append(country.name.common).append("\n")
