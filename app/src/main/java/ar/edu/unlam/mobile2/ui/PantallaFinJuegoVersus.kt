@@ -7,12 +7,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -23,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,8 +44,6 @@ class PantallaFinJuegoVersus : ComponentActivity() {
 		}
 	}
 	
-	
-	
 	@SuppressLint("UnrememberedMutableState")
 	@Composable
 	fun PantallaFinal(puntos: Int, paisesAcertados: Int){
@@ -50,41 +51,50 @@ class PantallaFinJuegoVersus : ComponentActivity() {
 		intent.putExtra("puntos", puntos)
 		intent.putExtra("paisesAcertados",paisesAcertados)
 		
-		Column(
+		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.background(Color.Black)
 		) {
-			ImagenLogo()
-			Spacer(modifier = Modifier.padding(20.dp))
-			Text(
-				text = " Su Puntaje  es: $puntos  puntos    ",
-				style = MaterialTheme.typography.headlineMedium,
-				modifier = Modifier
-					.padding(16.dp)
-					.align(CenterHorizontally),
-				softWrap = true,
-				fontSize = 25.sp,
-				color = Color.White,
-				textAlign = TextAlign.Center,
-				overflow = TextOverflow.Ellipsis,
+			Image(
+				painter = painterResource(id = R.drawable.fondo_qr),
+				contentDescription = null,
+				contentScale = ContentScale.Crop,
+				modifier = Modifier.fillMaxSize()
 			)
-			Text(
-				text = " Acertó $paisesAcertados  pais(es)",
-				style = MaterialTheme.typography.headlineMedium,
-				modifier = Modifier
-					.padding(16.dp)
-					.align(CenterHorizontally),
-				softWrap = true,
-				fontSize = 25.sp,
-				color = Color.White,
-				textAlign = TextAlign.Center,
-				overflow = TextOverflow.Ellipsis,
-			)
-			
-			Spacer(modifier = Modifier.padding(10
-				.dp))
-			boton(Modifier.align(CenterHorizontally))
+			Column(
+				modifier = Modifier.fillMaxSize()
+			) {
+				ImagenLogo()
+				Spacer(modifier = Modifier.padding(20.dp))
+				Text(
+					text = " Su puntaje  es: $puntos  puntos",
+					style = MaterialTheme.typography.headlineMedium,
+					modifier = Modifier
+						.padding(16.dp)
+						.align(CenterHorizontally),
+					softWrap = true,
+					fontSize = 25.sp,
+					color = Color.White,
+					textAlign = TextAlign.Center,
+					overflow = TextOverflow.Ellipsis,
+				)
+				Text(
+					text = " Acertó $paisesAcertados  pais(es)",
+					style = MaterialTheme.typography.headlineMedium,
+					modifier = Modifier
+						.padding(16.dp)
+						.align(CenterHorizontally),
+					softWrap = true,
+					fontSize = 25.sp,
+					color = Color.White,
+					textAlign = TextAlign.Center,
+					overflow = TextOverflow.Ellipsis,
+				)
+				
+				Spacer(modifier = Modifier.padding(10
+					.dp))
+				boton(Modifier.align(CenterHorizontally))
+			}
 		}
 	}
 	
@@ -94,16 +104,18 @@ class PantallaFinJuegoVersus : ComponentActivity() {
 			modifier = modifier
 				.height(50.dp)
 				.width(180.dp),
-			shape = RoundedCornerShape(50),
-			colors = ButtonDefaults.buttonColors(Color(0xFF396AE9)),
-			
+			colors = ButtonDefaults.buttonColors(Color.Transparent),
 			onClick = {
 				startActivity(Intent(this@PantallaFinJuegoVersus, PantallaPrincipal::class.java))
 				overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 				finish()
 			}) {
-			Text(text = "Volver")
-			
+			Image(
+				painter = painterResource(id = R.drawable.volver),
+				contentDescription = "imagenPista",
+				modifier = Modifier
+					.size(120.dp),
+			)
 		}
 	}
 	@Composable

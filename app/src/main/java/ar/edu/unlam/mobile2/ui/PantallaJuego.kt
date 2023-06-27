@@ -831,7 +831,7 @@ class PantallaJuego : ComponentActivity() {
             if (errado) {
                 scope.launch {
                     delay(2000)
-                    acertado = false
+                    errado = false
                 }
             }
         }

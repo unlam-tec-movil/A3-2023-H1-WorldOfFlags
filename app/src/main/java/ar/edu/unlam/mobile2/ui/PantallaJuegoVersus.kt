@@ -15,10 +15,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedContent
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -38,6 +40,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -779,31 +782,35 @@ class PantallaJuegoVersus : ComponentActivity() {
         LaunchedEffect(errado) {
             if (errado) {
                 scope.launch {
-                    delay(2000)
+                    delay(1500)
                     errado = false
                 }
             }
         }
         AnimatedVisibility(
-            errado,enter = fadeIn() + slideInVertically(),
-            exit = fadeOut() + slideOutVertically(),
-            
+            errado,
+            enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically()
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(450.dp)
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.BottomCenter
             ) {
-            Box( modifier = Modifier
-                .size(450.dp)
-                .background(Color.Transparent), Alignment.BottomCenter
-            ) {
-                Column() {
-                    Image(painterResource(id = R.drawable.pais_incorrecto),
-                        modifier=Modifier.align(Alignment.CenterHorizontally),
-                        contentDescription = "")
+                Column {
+                    Image(
+                        painter = painterResource(id = R.drawable.pais_incorrecto),
+                        modifier = Modifier.align(CenterHorizontally),
+                        contentDescription = ""
+                    )
                 }
             }
         }
     }
     
     @Composable
-    fun CountryOkAnimation(modifier:Modifier) {
+    fun CountryOkAnimation(modifier: Modifier) {
         val scope = rememberCoroutineScope()
         LaunchedEffect(acertado) {
             if (acertado) {
@@ -814,16 +821,22 @@ class PantallaJuegoVersus : ComponentActivity() {
             }
         }
         AnimatedVisibility(
-            acertado,enter = fadeIn() + slideInVertically(),
-            exit = fadeOut() + slideOutVertically(),
+            acertado,
+            enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically()
         ) {
-            Box( modifier = Modifier
-                .size(450.dp)
-                .background(Color.Transparent), BottomCenter ) {
-                Column() {
-                    Image(painterResource(id = R.drawable.pais_correcto),
-                        modifier=Modifier.align(CenterHorizontally),
-                        contentDescription = "")
+            Box(
+                modifier = Modifier
+                    .size(450.dp)
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Column {
+                    Image(
+                        painter = painterResource(id = R.drawable.pais_correcto),
+                        modifier = Modifier.align(CenterHorizontally),
+                        contentDescription = ""
+                    )
                 }
             }
         }
