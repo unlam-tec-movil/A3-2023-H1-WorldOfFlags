@@ -429,7 +429,8 @@ class PantallaJuegoVersus : ComponentActivity() {
         intent.putExtra("longitude", longitudeCorrectCountryGame)
         intent.putExtra("versus", true)
         intent.putExtra("index", countryIndex)
-    
+        var moveToTheLeft = false
+        var moveToTheRight = false
     
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
@@ -500,34 +501,51 @@ class PantallaJuegoVersus : ComponentActivity() {
                                     
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
-                                                acertado = true
-                                                paisesAcertados+=1
-                                                puntos += 10
-                                                val progressDialog =
-                                                    AlertDialog.Builder(this@PantallaJuegoVersus)
-                                                        .setView(R.layout.layout_loading)
-                                                        .setCancelable(false)
-                                                        .create()
-                                                progressDialog.window?.setBackgroundDrawable(
-                                                    ColorDrawable(android.graphics.Color.TRANSPARENT)
-                                                )
-                                            
-                                                progressDialog.show()
-                                            
-                                                Handler(Looper.getMainLooper()).postDelayed({
-                                                    progressDialog.dismiss()
-                                                    intent.putExtra("paisesAcertados",paisesAcertados)
-                                                    intent.putExtra("puntos", puntos)
-                                                    intent.putExtra(
-                                                        "cancelarMovimiento",
-                                                        cancelarMovimiento
+                                                moveToTheLeft = true
+                                                if (moveToTheLeft && !moveToTheRight) {
+                                                    acertado = true
+                                                    paisesAcertados += 1
+                                                    puntos += 10
+                                                    val progressDialog =
+                                                        AlertDialog.Builder(this@PantallaJuegoVersus)
+                                                            .setView(R.layout.layout_loading)
+                                                            .setCancelable(false)
+                                                            .create()
+                                                    progressDialog.window?.setBackgroundDrawable(
+                                                        ColorDrawable(android.graphics.Color.TRANSPARENT)
                                                     )
-                                                    startActivity(intent)
+
+                                                    progressDialog.show()
+
+                                                    Handler(Looper.getMainLooper()).postDelayed({
+                                                        progressDialog.dismiss()
+                                                        intent.putExtra(
+                                                            "paisesAcertados",
+                                                            paisesAcertados
+                                                        )
+                                                        intent.putExtra("puntos", puntos)
+                                                        intent.putExtra(
+                                                            "cancelarMovimiento",
+                                                            cancelarMovimiento
+                                                        )
+                                                        startActivity(intent)
+                                                        buttonIsVisible = true
+                                                        capitalVisibility = false
+                                                    }, 2000)
+                                                }
+                                            }
+                                            TiltDirection.RIGHT -> {
+                                                moveToTheRight = true
+                                                if (moveToTheRight && moveToTheLeft == false) {
+                                                    errado = true
+                                                    lifecycleScope.launch {
+                                                        delay(2000)
+                                                        launchCountries()
+                                                    }
                                                     buttonIsVisible = true
                                                     capitalVisibility = false
-                                                }, 2000)
+                                                }
                                             }
-                                        
                                             else -> {
                                             }
                                         }
@@ -572,7 +590,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                                         color = Color(0xFF105590),
                                         textAlign = TextAlign.Center,
                                     )
-                                    if (cancelarMovimiento == false) {
+                                  /*  if (cancelarMovimiento == false) {
                                     
                                         when (tiltDirection.value) {
                                             TiltDirection.RIGHT -> {
@@ -588,7 +606,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                                             else -> {
                                             }
                                         }
-                                    }
+                                    }*/
                                 }
                             }
                         }
@@ -647,13 +665,50 @@ class PantallaJuegoVersus : ComponentActivity() {
                                     
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
-                                                errado = true
-                                                lifecycleScope.launch {
-                                                    delay(2000)
-                                                    launchCountries()
+                                                moveToTheLeft = true
+                                                if (moveToTheLeft && !moveToTheRight) {
+                                                    errado = true
+                                                    lifecycleScope.launch {
+                                                        delay(2000)
+                                                        launchCountries()
+                                                    }
+                                                    buttonIsVisible = true
+                                                    capitalVisibility = false
                                                 }
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
+                                            }
+                                            TiltDirection.RIGHT -> {
+                                                moveToTheRight = true
+                                                if (moveToTheRight && moveToTheLeft == false) {
+                                                    acertado = true
+                                                    paisesAcertados += 1
+                                                    puntos += 10
+                                                    val progressDialog =
+                                                        AlertDialog.Builder(this@PantallaJuegoVersus)
+                                                            .setView(R.layout.layout_loading)
+                                                            .setCancelable(false)
+                                                            .create()
+                                                    progressDialog.window?.setBackgroundDrawable(
+                                                        ColorDrawable(android.graphics.Color.TRANSPARENT)
+                                                    )
+
+                                                    progressDialog.show()
+
+                                                    Handler(Looper.getMainLooper()).postDelayed({
+                                                        progressDialog.dismiss()
+                                                        intent.putExtra(
+                                                            "paisesAcertados",
+                                                            paisesAcertados
+                                                        )
+                                                        intent.putExtra("puntos", puntos)
+                                                        intent.putExtra(
+                                                            "cancelarMovimiento",
+                                                            cancelarMovimiento
+                                                        )
+                                                        startActivity(intent)
+                                                        buttonIsVisible = true
+                                                        capitalVisibility = false
+                                                    }, 2000)
+                                                }
                                             }
                                             else -> {
                                             }
@@ -720,42 +775,48 @@ class PantallaJuegoVersus : ComponentActivity() {
                                         color = Color(0xFF105590),
                                         textAlign = TextAlign.Center,
                                     )
-                                    if (cancelarMovimiento == false) {
-                                    
+                                  /*  if (cancelarMovimiento == false) {
+
                                         when (tiltDirection.value) {
                                             TiltDirection.RIGHT -> {
-                                                acertado = true
-                                                paisesAcertados+=1
-                                                puntos += 10
-                                                val progressDialog =
-                                                    AlertDialog.Builder(this@PantallaJuegoVersus)
-                                                        .setView(R.layout.layout_loading)
-                                                        .setCancelable(false)
-                                                        .create()
-                                                progressDialog.window?.setBackgroundDrawable(
-                                                    ColorDrawable(android.graphics.Color.TRANSPARENT)
-                                                )
-                                            
-                                                progressDialog.show()
-                                            
-                                                Handler(Looper.getMainLooper()).postDelayed({
-                                                    progressDialog.dismiss()
-                                                    intent.putExtra("paisesAcertados",paisesAcertados)
-                                                    intent.putExtra("puntos", puntos)
-                                                    intent.putExtra(
-                                                        "cancelarMovimiento",
-                                                        cancelarMovimiento
+                                                moveToTheRight = true
+                                                if (moveToTheRight && moveToTheLeft == false) {
+                                                    acertado = true
+                                                    paisesAcertados += 1
+                                                    puntos += 10
+                                                    val progressDialog =
+                                                        AlertDialog.Builder(this@PantallaJuegoVersus)
+                                                            .setView(R.layout.layout_loading)
+                                                            .setCancelable(false)
+                                                            .create()
+                                                    progressDialog.window?.setBackgroundDrawable(
+                                                        ColorDrawable(android.graphics.Color.TRANSPARENT)
                                                     )
-                                                    startActivity(intent)
-                                                    buttonIsVisible = true
-                                                    capitalVisibility = false
-                                                }, 2000)
+
+                                                    progressDialog.show()
+
+                                                    Handler(Looper.getMainLooper()).postDelayed({
+                                                        progressDialog.dismiss()
+                                                        intent.putExtra(
+                                                            "paisesAcertados",
+                                                            paisesAcertados
+                                                        )
+                                                        intent.putExtra("puntos", puntos)
+                                                        intent.putExtra(
+                                                            "cancelarMovimiento",
+                                                            cancelarMovimiento
+                                                        )
+                                                        startActivity(intent)
+                                                        buttonIsVisible = true
+                                                        capitalVisibility = false
+                                                    }, 2000)
+                                                }
                                             }
                                         
                                             else -> {
                                             }
                                         }
-                                    }
+                                    }*/
                                 }
                             }
                         }
