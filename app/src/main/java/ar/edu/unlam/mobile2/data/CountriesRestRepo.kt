@@ -24,4 +24,14 @@ class CountriesRestRepo @Inject constructor(builder: Builder) : CountriesRepo{
         }
         return emptyList()
     }
+    
+    override suspend fun getCountryByName(name: String): List<CountryModel>? {
+        val countryApi = retrofit.create(CountriesAPI::class.java)
+        val call = countryApi.getCountryByName(name)
+        val country = call.body()
+        if (call.isSuccessful){
+            return country
+        }
+        return null
+    }
 }

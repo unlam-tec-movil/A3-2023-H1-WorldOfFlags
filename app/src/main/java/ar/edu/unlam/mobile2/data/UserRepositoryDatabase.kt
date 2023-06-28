@@ -18,17 +18,17 @@ class UserRepositoryDatabase @Inject constructor(private val dao: UserDao) {
         val response: List<UserEntity> = dao.getAllUser()
         return response[0].toUser()
     }
-
-
-    /*
-        suspend fun traerUserDatabase(): UserModel {
-            val response: List<UserEntity> = database.userDao().getAllUser()
-            return response[0].toUser()
-        }
-
-
-    suspend fun agregarUsuario(user: UserEntity) {
-        database.userDao().insert(user)
+    fun devolverUsuarios():Int{
+        val response: List<UserEntity> = dao.getAllUser()
+        return response.size
     }
-     */
+
+    fun getAllUser():List<UserModel>{
+        val response: List<UserEntity> = dao.getAllUser()
+        return response.map { it.toUser() }
+    }
+
+
+
+
 }
