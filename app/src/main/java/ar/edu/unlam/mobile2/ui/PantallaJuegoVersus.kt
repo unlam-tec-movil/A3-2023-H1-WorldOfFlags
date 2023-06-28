@@ -300,7 +300,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                     }
                 } else {
                     Image(
-                        painter = painterResource(id = R.drawable.boton_ayuda),
+                        painter = painterResource(id = R.drawable.img_5),
                         contentDescription = "Ayuda",
                         modifier = Modifier.size(45.dp)
                     )
