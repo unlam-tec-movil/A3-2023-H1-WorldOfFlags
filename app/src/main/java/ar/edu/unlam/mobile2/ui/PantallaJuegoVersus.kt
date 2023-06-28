@@ -590,23 +590,6 @@ class PantallaJuegoVersus : ComponentActivity() {
                                         color = Color(0xFF105590),
                                         textAlign = TextAlign.Center,
                                     )
-                                  /*  if (cancelarMovimiento == false) {
-                                    
-                                        when (tiltDirection.value) {
-                                            TiltDirection.RIGHT -> {
-                                                errado = true
-                                                lifecycleScope.launch {
-                                                    delay(2000)
-                                                    launchCountries()
-                                                }
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
-                                            }
-                                        
-                                            else -> {
-                                            }
-                                        }
-                                    }*/
                                 }
                             }
                         }
@@ -775,48 +758,6 @@ class PantallaJuegoVersus : ComponentActivity() {
                                         color = Color(0xFF105590),
                                         textAlign = TextAlign.Center,
                                     )
-                                  /*  if (cancelarMovimiento == false) {
-
-                                        when (tiltDirection.value) {
-                                            TiltDirection.RIGHT -> {
-                                                moveToTheRight = true
-                                                if (moveToTheRight && moveToTheLeft == false) {
-                                                    acertado = true
-                                                    paisesAcertados += 1
-                                                    puntos += 10
-                                                    val progressDialog =
-                                                        AlertDialog.Builder(this@PantallaJuegoVersus)
-                                                            .setView(R.layout.layout_loading)
-                                                            .setCancelable(false)
-                                                            .create()
-                                                    progressDialog.window?.setBackgroundDrawable(
-                                                        ColorDrawable(android.graphics.Color.TRANSPARENT)
-                                                    )
-
-                                                    progressDialog.show()
-
-                                                    Handler(Looper.getMainLooper()).postDelayed({
-                                                        progressDialog.dismiss()
-                                                        intent.putExtra(
-                                                            "paisesAcertados",
-                                                            paisesAcertados
-                                                        )
-                                                        intent.putExtra("puntos", puntos)
-                                                        intent.putExtra(
-                                                            "cancelarMovimiento",
-                                                            cancelarMovimiento
-                                                        )
-                                                        startActivity(intent)
-                                                        buttonIsVisible = true
-                                                        capitalVisibility = false
-                                                    }, 2000)
-                                                }
-                                            }
-                                        
-                                            else -> {
-                                            }
-                                        }
-                                    }*/
                                 }
                             }
                         }

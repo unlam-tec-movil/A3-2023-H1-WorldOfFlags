@@ -3,6 +3,7 @@ package ar.edu.unlam.mobile2.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,12 +38,6 @@ class PantallaScanearQr : ComponentActivity() {
             }
         }
     }
-    private fun initScanner() {
-        val integrator = IntentIntegrator(this)
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-        integrator.setPrompt("Busca un Codigo Qr")
-        integrator.initiateScan()
-    }
 
     private val qrScanActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -59,38 +54,8 @@ class PantallaScanearQr : ComponentActivity() {
                 }
             }
         }
-
     @Composable
     fun QRScannerScreen() {
-        initScanner()
         qrScanActivityResult.launch(Intent(this, CaptureActivity::class.java))
     }
-/*
-    private fun initScanner() {
-        val integrator = IntentIntegrator(this)
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-        integrator.setPrompt("Busca un Codigo Qr")
-        integrator.initiateScan()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null && result.contents != null) {
-            val context = this
-            lifecycleScope.launch {
-                countriesQR = viewModel.createCountryModelByName(result.contents)
-                withContext(Dispatchers.Main){
-                    DatosJuego.listaPaises = countriesQR as List<CountryModel>
-                    startActivity(Intent(context, PantallaJuegoVersus::class.java))
-                }
-            }
-        }
-    }
-    
-    @Composable
-    fun QRScannerScreen() {
-        initScanner()
-    }*/
 }
