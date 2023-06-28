@@ -423,7 +423,8 @@ class PantallaJuego : ComponentActivity() {
         intent.putExtra("vidas", vidas)
         var moveToTheLeft = false
         var moveToTheRight = false
-
+        var buttomLeft =false
+        var buttomRight = false
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
                 Box(
@@ -454,28 +455,34 @@ class PantallaJuego : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            acertado=true
-                                            puntos += 10
-                                            val progressDialog =
-                                                AlertDialog.Builder(this@PantallaJuego)
-                                                    .setView(R.layout.layout_loading)
-                                                    .setCancelable(false)
-                                                    .create()
-                                            progressDialog.window?.setBackgroundDrawable(
-                                                ColorDrawable(
-                                                    android.graphics.Color.TRANSPARENT
+                                            buttomLeft = true
+                                            if (buttomLeft && !buttomRight) {
+                                                acertado = true
+                                                puntos += 10
+                                                val progressDialog =
+                                                    AlertDialog.Builder(this@PantallaJuego)
+                                                        .setView(R.layout.layout_loading)
+                                                        .setCancelable(false)
+                                                        .create()
+                                                progressDialog.window?.setBackgroundDrawable(
+                                                    ColorDrawable(
+                                                        android.graphics.Color.TRANSPARENT
+                                                    )
                                                 )
-                                            )
-                                            progressDialog.show()
-                                    
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                progressDialog.dismiss()
-                                                intent.putExtra("puntos", puntos)
-                                                intent.putExtra("cancelarMovimiento", cancelarMovimiento)
-                                                startActivity(intent)
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
-                                            }, 2000)
+                                                progressDialog.show()
+
+                                                Handler(Looper.getMainLooper()).postDelayed({
+                                                    progressDialog.dismiss()
+                                                    intent.putExtra("puntos", puntos)
+                                                    intent.putExtra(
+                                                        "cancelarMovimiento",
+                                                        cancelarMovimiento
+                                                    )
+                                                    startActivity(intent)
+                                                    buttonIsVisible = true
+                                                    capitalVisibility = false
+                                                }, 2000)
+                                            }
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -557,6 +564,8 @@ class PantallaJuego : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
+                                            buttomRight = true
+                                            if (buttomRight && !buttomLeft) {
                                                 buttonIsVisible = true
                                                 capitalVisibility = false
                                                 errado = true
@@ -565,6 +574,7 @@ class PantallaJuego : ComponentActivity() {
                                                     launchCountries()
                                                 }
                                                 this@PantallaJuego.vidas -= 1
+                                            }
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -612,6 +622,8 @@ class PantallaJuego : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
+                                            buttomLeft = true
+                                            if (buttomLeft && !buttomRight) {
                                                 errado = true
                                                 lifecycleScope.launch {
                                                     delay(1500)
@@ -620,6 +632,7 @@ class PantallaJuego : ComponentActivity() {
                                                 buttonIsVisible = true
                                                 capitalVisibility = false
                                                 this@PantallaJuego.vidas -= 1
+                                            }
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -704,32 +717,35 @@ class PantallaJuego : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            acertado=true
-                                            puntos += 10
-                                            val progressDialog =
-                                                AlertDialog.Builder(this@PantallaJuego)
-                                                    .setView(R.layout.layout_loading)
-                                                    .setCancelable(false)
-                                                    .create()
-                                            progressDialog.window?.setBackgroundDrawable(
-                                                ColorDrawable(
-                                                    android.graphics.Color.TRANSPARENT
+                                            buttomRight = true
+                                            if (buttomRight && !buttomLeft) {
+                                                acertado = true
+                                                puntos += 10
+                                                val progressDialog =
+                                                    AlertDialog.Builder(this@PantallaJuego)
+                                                        .setView(R.layout.layout_loading)
+                                                        .setCancelable(false)
+                                                        .create()
+                                                progressDialog.window?.setBackgroundDrawable(
+                                                    ColorDrawable(
+                                                        android.graphics.Color.TRANSPARENT
+                                                    )
                                                 )
-                                            )
-                                    
-                                            progressDialog.show()
-                                    
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                progressDialog.dismiss()
-                                                intent.putExtra("puntos", puntos)
-                                                intent.putExtra(
-                                                    "cancelarMovimiento",
-                                                    cancelarMovimiento
-                                                )
-                                                startActivity(intent)
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
-                                            }, 2000)
+
+                                                progressDialog.show()
+
+                                                Handler(Looper.getMainLooper()).postDelayed({
+                                                    progressDialog.dismiss()
+                                                    intent.putExtra("puntos", puntos)
+                                                    intent.putExtra(
+                                                        "cancelarMovimiento",
+                                                        cancelarMovimiento
+                                                    )
+                                                    startActivity(intent)
+                                                    buttonIsVisible = true
+                                                    capitalVisibility = false
+                                                }, 2000)
+                                            }
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
