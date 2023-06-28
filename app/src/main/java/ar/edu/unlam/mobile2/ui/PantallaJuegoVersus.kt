@@ -431,7 +431,8 @@ class PantallaJuegoVersus : ComponentActivity() {
         intent.putExtra("index", countryIndex)
         var moveToTheLeft = false
         var moveToTheRight = false
-    
+        var buttomLeft =false
+        var buttomRight = false
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
                 Box(
@@ -462,30 +463,39 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            acertado=true
-                                            paisesAcertados+=1
-                                            puntos += 10
-                                            val progressDialog =
-                                                AlertDialog.Builder(this@PantallaJuegoVersus)
-                                                    .setView(R.layout.layout_loading)
-                                                    .setCancelable(false)
-                                                    .create()
-                                            progressDialog.window?.setBackgroundDrawable(
-                                                ColorDrawable(
-                                                    android.graphics.Color.TRANSPARENT
+                                            buttomLeft = true
+                                            if (buttomLeft && !buttomRight) {
+                                                acertado = true
+                                                paisesAcertados += 1
+                                                puntos += 10
+                                                val progressDialog =
+                                                    AlertDialog.Builder(this@PantallaJuegoVersus)
+                                                        .setView(R.layout.layout_loading)
+                                                        .setCancelable(false)
+                                                        .create()
+                                                progressDialog.window?.setBackgroundDrawable(
+                                                    ColorDrawable(
+                                                        android.graphics.Color.TRANSPARENT
+                                                    )
                                                 )
-                                            )
-                                            progressDialog.show()
-                                        
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                progressDialog.dismiss()
-                                                intent.putExtra("paisesAcertados",paisesAcertados)
-                                                intent.putExtra("puntos", puntos)
-                                                intent.putExtra("cancelarMovimiento", cancelarMovimiento)
-                                                startActivity(intent)
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
-                                            }, 2000)
+                                                progressDialog.show()
+
+                                                Handler(Looper.getMainLooper()).postDelayed({
+                                                    progressDialog.dismiss()
+                                                    intent.putExtra(
+                                                        "paisesAcertados",
+                                                        paisesAcertados
+                                                    )
+                                                    intent.putExtra("puntos", puntos)
+                                                    intent.putExtra(
+                                                        "cancelarMovimiento",
+                                                        cancelarMovimiento
+                                                    )
+                                                    startActivity(intent)
+                                                    buttonIsVisible = true
+                                                    capitalVisibility = false
+                                                }, 2000)
+                                            }
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -572,13 +582,16 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            errado = true
-                                            lifecycleScope.launch {
-                                                delay(2000)
-                                                launchCountries()
+                                            buttomRight = true
+                                            if (buttomRight && !buttomLeft) {
+                                                errado = true
+                                                lifecycleScope.launch {
+                                                    delay(2000)
+                                                    launchCountries()
+                                                }
+                                                buttonIsVisible = true
+                                                capitalVisibility = false
                                             }
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -626,13 +639,16 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            errado = true
-                                            lifecycleScope.launch {
-                                                delay(2000)
-                                                launchCountries()
+                                            buttomLeft = true
+                                            if (buttomLeft && !buttomRight) {
+                                                errado = true
+                                                lifecycleScope.launch {
+                                                    delay(2000)
+                                                    launchCountries()
+                                                }
+                                                buttonIsVisible = true
+                                                capitalVisibility = false
                                             }
-                                            buttonIsVisible = true
-                                            capitalVisibility = false
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -719,34 +735,40 @@ class PantallaJuegoVersus : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         if (cancelarMovimiento == true) {
-                                            acertado = true
-                                            paisesAcertados+=1
-                                            puntos += 10
-                                            val progressDialog =
-                                                AlertDialog.Builder(this@PantallaJuegoVersus)
-                                                    .setView(R.layout.layout_loading)
-                                                    .setCancelable(false)
-                                                    .create()
-                                            progressDialog.window?.setBackgroundDrawable(
-                                                ColorDrawable(
-                                                    android.graphics.Color.TRANSPARENT
+                                            buttomRight = true
+                                            if (buttomRight && !buttomLeft) {
+                                                acertado = true
+                                                paisesAcertados += 1
+                                                puntos += 10
+                                                val progressDialog =
+                                                    AlertDialog.Builder(this@PantallaJuegoVersus)
+                                                        .setView(R.layout.layout_loading)
+                                                        .setCancelable(false)
+                                                        .create()
+                                                progressDialog.window?.setBackgroundDrawable(
+                                                    ColorDrawable(
+                                                        android.graphics.Color.TRANSPARENT
+                                                    )
                                                 )
-                                            )
-                                        
-                                            progressDialog.show()
-                                        
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                progressDialog.dismiss()
-                                                intent.putExtra("paisesAcertados",paisesAcertados)
-                                                intent.putExtra("puntos", puntos)
-                                                intent.putExtra(
-                                                    "cancelarMovimiento",
-                                                    cancelarMovimiento
-                                                )
-                                                startActivity(intent)
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
-                                            }, 2000)
+
+                                                progressDialog.show()
+
+                                                Handler(Looper.getMainLooper()).postDelayed({
+                                                    progressDialog.dismiss()
+                                                    intent.putExtra(
+                                                        "paisesAcertados",
+                                                        paisesAcertados
+                                                    )
+                                                    intent.putExtra("puntos", puntos)
+                                                    intent.putExtra(
+                                                        "cancelarMovimiento",
+                                                        cancelarMovimiento
+                                                    )
+                                                    startActivity(intent)
+                                                    buttonIsVisible = true
+                                                    capitalVisibility = false
+                                                }, 2000)
+                                            }
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
