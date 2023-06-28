@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -220,7 +221,7 @@ class PantallaJuego : ComponentActivity() {
                         Column(modifier = Modifier.fillMaxSize()) {
                             TopBlock(modifier = Modifier.weight(0.5f), flag, nameUser, nacionalityUser, imageUser)
                             BottomBlock(modifier = Modifier.weight(0.25f), correctCountryNameInGame, incorrectCountryNameInGame, tiltDirection, latitudeCorrectCountryGame, longitudeCorrectCountryGame)
-                            Spacer(modifier = Modifier.height(55.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
                             ExpandableContent()
                         }
                     }
@@ -299,7 +300,7 @@ class PantallaJuego : ComponentActivity() {
                     Image(
                         painter = painterResource(id = R.drawable.img_5),
                         contentDescription = "Ayuda",
-                        modifier = Modifier.size(45.dp)
+                        modifier = Modifier.size(50.dp)
                     )
                 }
             }
