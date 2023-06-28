@@ -56,19 +56,18 @@ import ar.edu.unlam.mobile2.R
 import ar.edu.unlam.mobile2.model.CountryModel
 import ar.edu.unlam.mobile2.model.DatosJuego
 import ar.edu.unlam.mobile2.ui.ViewModel.PantallaQrViewModel
+import com.journeyapps.barcodescanner.CaptureActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.constraintlayout.compose.ConstraintLayout
-import com.journeyapps.barcodescanner.CaptureActivity
+
 
 
 @AndroidEntryPoint
 class PantallaScanearQr : ComponentActivity() {
     private val viewModel: PantallaQrViewModel by viewModels()
     private var countriesQR: List<CountryModel>? by mutableStateOf(null)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,18 +87,21 @@ class PantallaScanearQr : ComponentActivity() {
                 lifecycleScope.launch {
                     countriesQR = viewModel.createCountryModelByName(result.contents)
                     withContext(Dispatchers.Main) {
-                        DatosJuego.listaPaises = countriesQR as List<CountryModel>
-                        startActivity(Intent(context, PantallaJuegoVersus::class.java))
+                        withContext(Dispatchers.Main) {
+                            DatosJuego.listaPaises = countriesQR as List<CountryModel>
+                            startActivity(Intent(context, PantallaJuegoVersus::class.java))
+                        }
                     }
                 }
-            }else{
-                startActivity(Intent(this@PantallaScanearQr, PantallaPrincipal::class.java))
+                } else {
+                    startActivity(Intent(this@PantallaScanearQr, PantallaPrincipal::class.java))
+                }
+            }
+
+            @Composable
+            fun QRScannerScreen() {
+                qrScanActivityResult.launch(Intent(this, CaptureActivity::class.java))
             }
         }
 
-    @Composable
-    fun QRScannerScreen() {
-        qrScanActivityResult.launch(Intent(this, CaptureActivity::class.java))
-    }
-}
 

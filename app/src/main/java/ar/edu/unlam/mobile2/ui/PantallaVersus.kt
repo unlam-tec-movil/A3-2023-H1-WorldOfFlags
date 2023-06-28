@@ -128,7 +128,7 @@ class PantallaVersus : ComponentActivity() {
                 IconButton(onClick = {   startActivity(Intent(this@PantallaVersus,
                     MainActivity::class.java))
                     finish()}) {
-                    Image(painter = painterResource(id = R.drawable.ic_baseline_arrow_back_24),
+                    Image(painter = painterResource(id = R.drawable.ic_baseline_arrow_back_black_24),
                         contentDescription = "icono menu")
                 }
                 DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false },

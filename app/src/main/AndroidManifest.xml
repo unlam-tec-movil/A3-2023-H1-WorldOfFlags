@@ -66,7 +66,7 @@
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
-            tools:replace="screenOrientation" />
+            tools:replace="android:screenOrientation" />
         <activity
             android:name=".ui.PantallaVersus"
             android:exported="false"
