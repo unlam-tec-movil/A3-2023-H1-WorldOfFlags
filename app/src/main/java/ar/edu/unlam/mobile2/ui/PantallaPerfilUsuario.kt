@@ -7,11 +7,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.hardware.Camera
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +59,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import ar.edu.unlam.mobile2.R
 import ar.edu.unlam.mobile2.data.Database.toDatabase
@@ -67,6 +71,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 @AndroidEntryPoint
 class PantallaPerfilUsuario : ComponentActivity() {
     private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
@@ -101,68 +106,78 @@ class PantallaPerfilUsuario : ComponentActivity() {
             scaffoldState = scaffoldState,
             topBar = { topBarPerfil() },
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black)
             ) {
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(14.dp))
-                }
-                nombreRegistro(
-                    Modifier.align(CenterHorizontally),
-                    nombre
+                Image(
+                    painter = painterResource(id = R.drawable.fondo_qr),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-                email(Modifier.align(CenterHorizontally), email)
-
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-                nacionalidad(
-                    Modifier.align(CenterHorizontally),
-                    nacionalidad
-                )
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(8.dp))
-                }
-                if (userViewModel.getAllUserDatabase().isEmpty()) {
-                    tomarFoto(Modifier.align(CenterHorizontally))
-                }
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(10.dp))
-                }
-                fotoPerfil(
-                    imagenFoto,
-                    Modifier
-                        .align(CenterHorizontally)
-                        .clip(CircleShape)
-                )
-                if (userViewModel.getAllUserDatabase().isNotEmpty()) {
-                    Spacer(modifier = Modifier.padding(25.dp))
-                } else {
-                    Spacer(modifier = Modifier.padding(10.dp))
-                }
-                if (userViewModel.getAllUserDatabase().isEmpty()) {
-                    botonGuardarCambios(
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(14.dp))
+                    }
+                    nombreRegistro(
                         Modifier.align(CenterHorizontally),
-                        nombre,
-                        email,
-                        nacionalidad,
-                        imagenFoto
+                        nombre
                     )
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                    email(Modifier.align(CenterHorizontally), email)
+                
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                    nacionalidad(
+                        Modifier.align(CenterHorizontally),
+                        nacionalidad
+                    )
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                    if (userViewModel.getAllUserDatabase().isEmpty()) {
+                        tomarFoto(Modifier.align(CenterHorizontally))
+                    }
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(10.dp))
+                    }
+                    fotoPerfil(
+                        imagenFoto,
+                        Modifier
+                            .align(CenterHorizontally)
+                            .clip(CircleShape)
+                    )
+                    if (userViewModel.getAllUserDatabase().isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(25.dp))
+                    } else {
+                        Spacer(modifier = Modifier.padding(10.dp))
+                    }
+                    if (userViewModel.getAllUserDatabase().isEmpty()) {
+                        botonGuardarCambios(
+                            Modifier.align(CenterHorizontally),
+                            nombre,
+                            email,
+                            nacionalidad,
+                            imagenFoto
+                        )
+                    }
                 }
             }
         }
@@ -303,9 +318,10 @@ class PantallaPerfilUsuario : ComponentActivity() {
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF939599)),
             onClick = {
-                pedirPermisoCamara()
+                askPermission()
+             //  pedirPermisoCamara()
             }) {
-            androidx.compose.material.Text(text = "Foto perfil (Presione aquí)")
+           Text(text = "Foto perfil (Presione aquí)")
         }
     }
 
@@ -457,10 +473,10 @@ class PantallaPerfilUsuario : ComponentActivity() {
             }
         )
     }
-
-    val CAMERA_REQUEST_CODE = 0
     lateinit var image: Bitmap
+ //   val CAMERA_REQUEST_CODE = 0
 
+/*
     /* permisos*/
 
     /*Esta funcion lo que hace es preguntar si  chekSelPermission es distinto
@@ -499,11 +515,12 @@ class PantallaPerfilUsuario : ComponentActivity() {
             )
         }
     }
-
+*/
     /*esta funcion lo que hace es sobreescribir el meteodo onRequestPermissionsResult,.
 
 
     * */
+    /*
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -515,34 +532,76 @@ class PantallaPerfilUsuario : ComponentActivity() {
             Toast.makeText(this, "permiso rechazado por primera vez", Toast.LENGTH_LONG).show()
             /*el permiso no ha sido aceptado*/
         }
+    }*/
+/*
+override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray,
+) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    if (requestCode == CAMERA_REQUEST_CODE) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            abrirCamara()
+
+        } else {
+            Toast.makeText(this, "permiso rechazado por primera vez", Toast.LENGTH_LONG).show()
+            /*el permiso no ha sido aceptado*/
+        }
     }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                abrirCamara()
-
-            } else {
-                Toast.makeText(this, "permiso rechazado por primera vez", Toast.LENGTH_LONG).show()
-                /*el permiso no ha sido aceptado*/
+}
+*/
+    private val takePictureLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            val photo: Bitmap? = data?.extras?.get("data") as Bitmap?
+            if (photo != null) {
+                image = photo
+                viewModel.fotoSacadaCamara(image)
             }
+        } else {
+            Toast.makeText(this, "permiso rechazado por primera vez", Toast.LENGTH_LONG).show()
+
         }
     }
 
     private fun abrirCamara() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, CAMERA_REQUEST_CODE)
-
-        //   Toast.makeText(this, "Abriendo Camara", Toast.LENGTH_LONG).show()
-
+       // intent.putExtra("android.intent.extras.CAMERA_FACING", Camera.CameraInfo.CAMERA_FACING_FRONT)
+    takePictureLauncher.launch(intent)
+        //startActivityForResult(intent, CAMERA_REQUEST_CODE)
     }
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+               abrirCamara()
+            } else {
+                Toast.makeText(
+                    this,
+                    "El permiso de la cámara ha sido denegado." +
+                            " No se puede capturar la foto.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
 
+    private fun askPermission() = when {
+       checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED -> {
+            abrirCamara()
+        }
+        else -> {
+
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
 }
 
 

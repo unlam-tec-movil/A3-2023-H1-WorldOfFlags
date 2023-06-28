@@ -26,10 +26,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import ar.edu.unlam.mobile2.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,44 +77,57 @@ class PantallaQR : ComponentActivity() {
     @Composable
     
     fun PrincipalScreenQR(codeQR: Bitmap?, codeQRGenerated: Boolean, context: Context) {
-        
+    
         val scaffoldState = rememberScaffoldState()
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { TopBarQR() },
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black)
-                    .padding(vertical = 16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Escanea el siguiente QR",
-                    color = Color.White,
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier.padding(top = 16.dp)
-
+                Image(
+                    painter = painterResource(id = R.drawable.fondo_qr),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                Spacer(modifier = Modifier.padding(10.dp))
-                if (codeQRGenerated) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                    ){
-                        QRCode(codeQR)
-                        StartButton(modifier = Modifier.align(Alignment.CenterHorizontally), context)
-                    }
-                } else {
-                    // Muestra un indicador de carga mientras se genera el QR
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .align(CenterHorizontally)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Escanea el siguiente QR",
+                        color = Color(0xFF105590),
+                        modifier = Modifier.padding(top = 16.dp),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp
                     )
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    if (codeQRGenerated) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                        ) {
+                            QRCode(codeQR)
+                            StartButton(
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                context
+                            )
+                        }
+                    } else {
+                        // Muestra un indicador de carga mientras se genera el QR
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .align(CenterHorizontally)
+                        )
+                    }
                 }
             }
         }
@@ -119,10 +135,7 @@ class PantallaQR : ComponentActivity() {
     
     @Composable
     fun StartButton(modifier: Modifier, context: Context) {
-        Button(
-            modifier = modifier,
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF396AE9)),
+        androidx.compose.material3.Button(
             onClick = {
                 lifecycleScope.launch {
                     val content: String = viewModel.qrCodeContent.value!!
@@ -132,8 +145,19 @@ class PantallaQR : ComponentActivity() {
                         startActivity(Intent(context, PantallaJuegoVersus::class.java))
                     }
                 }
-            }) {
-            androidx.compose.material.Text(text = "Comenzar Versus")
+            },
+            modifier = modifier
+                .height(100.dp)
+                .width(500.dp),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.buttonColors(Color.Transparent),
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.comenzar_versus),
+                contentDescription = "imagenPista",
+                modifier = Modifier
+                    .size(120.dp),
+            )
         }
     }
     
