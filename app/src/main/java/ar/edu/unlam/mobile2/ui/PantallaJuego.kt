@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -43,11 +42,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material.TopAppBar
@@ -68,9 +65,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -78,7 +73,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
@@ -346,7 +340,8 @@ class PantallaJuego : ComponentActivity() {
         intent.putExtra("latitude", latitudeCorrectCountryGame)
         intent.putExtra("longitude", longitudeCorrectCountryGame)
         intent.putExtra("vidas", vidas)
-
+        var moveToTheLeft = false
+        var moveToTheRight = false
 
         when (Random.nextInt(from = 1, until = 3)) {
             1 -> {
@@ -414,30 +409,48 @@ class PantallaJuego : ComponentActivity() {
                                     if (cancelarMovimiento == false) {
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
-                                                acertado=true
-                                                puntos += 10
-                                                val progressDialog =
-                                                    AlertDialog.Builder(this@PantallaJuego)
-                                                        .setView(R.layout.layout_loading)
-                                                        .setCancelable(false)
-                                                        .create()
-                                                progressDialog.window?.setBackgroundDrawable(
-                                                    ColorDrawable(android.graphics.Color.TRANSPARENT)
-                                                )
-                                                progressDialog.show()
-                                                Handler(Looper.getMainLooper()).postDelayed({
-                                                    progressDialog.dismiss()
-                                                    intent.putExtra("puntos", puntos)
-                                                    intent.putExtra(
-                                                        "cancelarMovimiento",
-                                                        cancelarMovimiento
+                                                moveToTheLeft = true
+                                                if (moveToTheLeft && !moveToTheRight) {
+                                                    acertado = true
+                                                    puntos += 10
+                                                    val progressDialog =
+                                                        AlertDialog.Builder(this@PantallaJuego)
+                                                            .setView(R.layout.layout_loading)
+                                                            .setCancelable(false)
+                                                            .create()
+                                                    progressDialog.window?.setBackgroundDrawable(
+                                                        ColorDrawable(android.graphics.Color.TRANSPARENT)
                                                     )
-                                                    startActivity(intent)
+                                                    progressDialog.show()
+                                                    Handler(Looper.getMainLooper()).postDelayed({
+                                                        progressDialog.dismiss()
+                                                        intent.putExtra("puntos", puntos)
+                                                        intent.putExtra(
+                                                            "cancelarMovimiento",
+                                                            cancelarMovimiento
+                                                        )
+                                                        startActivity(intent)
+                                                        buttonIsVisible = true
+                                                        capitalVisibility = false
+                                                    }, 2000)
+                                                }
+                                            }
+                                            TiltDirection.RIGHT -> {
+                                                moveToTheRight = true
+                                                if (moveToTheRight && moveToTheLeft == false) {
+                                                    errado = true
+                                                    lifecycleScope.launch {
+                                                        delay(2000)
+                                                        launchCountries()
+                                                    }
                                                     buttonIsVisible = true
                                                     capitalVisibility = false
-                                                }, 2000)
+                                                    this@PantallaJuego.vidas -= 1
+                                                }
                                             }
+
                                             else -> {
+
                                             }
                                         }
                                     }
@@ -482,22 +495,6 @@ class PantallaJuego : ComponentActivity() {
                                         color = Color(0xFF105590),
                                         textAlign = TextAlign.Center,
                                     )
-                                    if (cancelarMovimiento == false) {
-                                        when (tiltDirection.value) {
-                                            TiltDirection.RIGHT -> {
-                                                errado = true
-                                                lifecycleScope.launch {
-                                                    delay(2000)
-                                                    launchCountries()
-                                                }
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
-                                                this@PantallaJuego.vidas -= 1
-                                            }
-                                            else -> {
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -556,17 +553,51 @@ class PantallaJuego : ComponentActivity() {
                                     if (cancelarMovimiento == false) {
                                         when (tiltDirection.value) {
                                             TiltDirection.LEFT -> {
-                                                errado = true
-                                                lifecycleScope.launch {
-                                                    delay(2000)
-                                                    launchCountries()
+                                                moveToTheLeft = true
+                                                if (moveToTheLeft && !moveToTheRight) {
+                                                    errado = true
+                                                    lifecycleScope.launch {
+                                                        delay(2000)
+                                                        launchCountries()
+                                                    }
+                                                    buttonIsVisible = true
+                                                    capitalVisibility = false
+                                                    this@PantallaJuego.vidas -= 1
+
                                                 }
-                                                buttonIsVisible = true
-                                                capitalVisibility = false
-                                                this@PantallaJuego.vidas -= 1
                                             }
-                                    
+                                            TiltDirection.RIGHT -> {
+                                                moveToTheRight = true
+                                                if (moveToTheRight && moveToTheLeft == false) {
+                                                    acertado = true
+                                                    puntos += 10
+                                                    val progressDialog =
+                                                        AlertDialog.Builder(this@PantallaJuego)
+                                                            .setView(R.layout.layout_loading)
+                                                            .setCancelable(false)
+                                                            .create()
+                                                    progressDialog.window?.setBackgroundDrawable(
+                                                        ColorDrawable(android.graphics.Color.TRANSPARENT)
+                                                    )
+
+                                                    progressDialog.show()
+
+                                                    Handler(Looper.getMainLooper()).postDelayed({
+                                                        progressDialog.dismiss()
+                                                        intent.putExtra("puntos", puntos)
+                                                        intent.putExtra(
+                                                            "cancelarMovimiento",
+                                                            cancelarMovimiento
+                                                        )
+                                                        startActivity(intent)
+                                                        buttonIsVisible = true
+                                                        capitalVisibility = false
+                                                    }, 2000)
+
+                                                }
+                                            }
                                             else -> {
+
                                             }
                                         }
                                     }
@@ -629,40 +660,6 @@ class PantallaJuego : ComponentActivity() {
                                         color = Color(0xFF105590),
                                         textAlign = TextAlign.Center,
                                     )
-                                    if (cancelarMovimiento == false) {
-                                
-                                        when (tiltDirection.value) {
-                                            TiltDirection.RIGHT -> {
-                                                acertado=true
-                                                puntos += 10
-                                                val progressDialog =
-                                                    AlertDialog.Builder(this@PantallaJuego)
-                                                        .setView(R.layout.layout_loading)
-                                                        .setCancelable(false)
-                                                        .create()
-                                                progressDialog.window?.setBackgroundDrawable(
-                                                    ColorDrawable(android.graphics.Color.TRANSPARENT)
-                                                )
-                                        
-                                                progressDialog.show()
-                                        
-                                                Handler(Looper.getMainLooper()).postDelayed({
-                                                    progressDialog.dismiss()
-                                                    intent.putExtra("puntos", puntos)
-                                                    intent.putExtra(
-                                                        "cancelarMovimiento",
-                                                        cancelarMovimiento
-                                                    )
-                                                    startActivity(intent)
-                                                    buttonIsVisible = true
-                                                    capitalVisibility = false
-                                                }, 2000)
-                                            }
-                                    
-                                            else -> {
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
