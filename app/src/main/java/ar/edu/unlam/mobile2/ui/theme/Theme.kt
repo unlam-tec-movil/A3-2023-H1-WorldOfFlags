@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.RepoViejo.theme
+package ar.edu.unlam.mobile2.ui.theme
 
 import android.app.Activity
 import android.os.Build

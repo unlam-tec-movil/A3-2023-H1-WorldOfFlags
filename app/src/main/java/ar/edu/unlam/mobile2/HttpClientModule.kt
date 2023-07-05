@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.RepoViejo
+package ar.edu.unlam.mobile2
 
 import android.content.Context
 import coil.ImageLoader
