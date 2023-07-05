@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.ui
+package ar.edu.unlam.mobile2.RepoViejo
 
 import android.os.Bundle
 import android.view.LayoutInflater

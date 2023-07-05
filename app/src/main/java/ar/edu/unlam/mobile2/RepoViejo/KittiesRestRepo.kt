@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.data
+package ar.edu.unlam.mobile2.RepoViejo
 
 import retrofit2.Retrofit
 import retrofit2.Retrofit.Builder

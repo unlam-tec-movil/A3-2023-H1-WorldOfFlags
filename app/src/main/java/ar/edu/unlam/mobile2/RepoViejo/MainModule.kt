@@ -1,9 +1,7 @@
-package ar.edu.unlam.mobile2
+package ar.edu.unlam.mobile2.RepoViejo
 
 import ar.edu.unlam.mobile2.data.CountriesRepo
 import ar.edu.unlam.mobile2.data.CountriesRestRepo
-import ar.edu.unlam.mobile2.data.KittiesRepo
-import ar.edu.unlam.mobile2.data.KittiesRestRepo
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

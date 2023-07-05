@@ -1,12 +1,12 @@
-package ar.edu.unlam.mobile2.ui
+package ar.edu.unlam.mobile2.RepoViejo
 
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile2.HttpClientModule
-import ar.edu.unlam.mobile2.domain.GetNewKitty
+import ar.edu.unlam.mobile2.RepoViejo.HttpClientModule
+import ar.edu.unlam.mobile2.RepoViejo.GetNewKitty
 import coil.ImageLoader
 import coil.request.ImageRequest
 import dagger.hilt.android.lifecycle.HiltViewModel

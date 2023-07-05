@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.data
+package ar.edu.unlam.mobile2.RepoViejo
 
 data class KittyApiModel(
     val id: String,

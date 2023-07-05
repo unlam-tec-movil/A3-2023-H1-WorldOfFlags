@@ -1,5 +1,6 @@
-package ar.edu.unlam.mobile2.data
+package ar.edu.unlam.mobile2.RepoViejo
 
+import ar.edu.unlam.mobile2.RepoViejo.KittyApiModel
 import retrofit2.Response
 import retrofit2.http.GET
 

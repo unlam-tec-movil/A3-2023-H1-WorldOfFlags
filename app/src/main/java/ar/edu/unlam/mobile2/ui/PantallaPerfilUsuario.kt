@@ -552,6 +552,8 @@ override fun onRequestPermissionsResult(
     }
 }
 */
+
+
     private val takePictureLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
