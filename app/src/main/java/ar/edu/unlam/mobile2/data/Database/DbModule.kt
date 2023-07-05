@@ -24,9 +24,5 @@ object DbModule {
     @Provides
     @Singleton
     fun provideDao(db: UserDatabase) = db.userDao()
-    /*
-        @Provides
-        fun provideEntity()=UserEntity()
-     */
 
 }

@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.ui.ui.theme
+package ar.edu.unlam.mobile2.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

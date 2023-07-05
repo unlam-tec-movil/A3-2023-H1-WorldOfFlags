@@ -80,16 +80,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import ar.edu.unlam.mobile2.R
-import ar.edu.unlam.mobile2.movimiento.DetectarMovimiento
-import ar.edu.unlam.mobile2.movimiento.TiltDirection
+import ar.edu.unlam.mobile2.domain.movimiento.DetectarMovimiento
+import ar.edu.unlam.mobile2.domain.movimiento.TiltDirection
 import ar.edu.unlam.mobile2.ui.ViewModel.CountriesViewModel
-import ar.edu.unlam.mobile2.ui.ViewModel.PantallaPerfilUsuarioViewModel
 import ar.edu.unlam.mobile2.ui.ViewModel.UserViewModel
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -103,7 +101,6 @@ import kotlin.random.Random
 class PantallaJuego : ComponentActivity() {
     private lateinit var motionDetector: DetectarMovimiento
     private val countriesViewModel: CountriesViewModel by viewModels()
-    private val viewModel: PantallaPerfilUsuarioViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
 
 
