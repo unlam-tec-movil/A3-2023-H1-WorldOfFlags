@@ -34,7 +34,7 @@
             android:label="@string/title_activity_pantalla_fin_juego_versus"
             android:theme="@style/Theme.Mobile2_Scaffolding" />
         <activity
-            android:name=".ui.PantallaCrearUsuario"
+            android:name=".ui.PantallaInicioSinUsuario"
             android:exported="false"
             android:label="@string/title_activity_pantalla_crear_usuario"
             android:theme="@style/Theme.Mobile2_Scaffolding" />

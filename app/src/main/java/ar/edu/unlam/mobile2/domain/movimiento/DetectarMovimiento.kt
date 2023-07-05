@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile2.movimiento
+package ar.edu.unlam.mobile2.domain.movimiento
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent

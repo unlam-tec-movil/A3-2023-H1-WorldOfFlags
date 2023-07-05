@@ -26,36 +26,11 @@ class PantallaPerfilUsuarioViewModel : ViewModel() {
     val fotosacadaAhora = mutableStateOf<Bitmap?>(null)
 
 
-    val userName=MutableLiveData<String>()
-    val emailUser=MutableLiveData<String>()
-    val nacionalidadUser=MutableLiveData<String>()
-    val imageUser= MutableLiveData<ImageBitmap?>()
-
-
     fun fotoSacadaCamara(imagenNueva: Bitmap) {
 
         _fotoPerfil.value = imagenNueva
         fotosacadaAhora.value = imagenNueva
     }
-
-
-
-
-
-
-    fun cambiarNacionalidad(nacionalidad: String) {
-        _nacionalidad.value = nacionalidad
-    }
-
-    fun cambiarNombre(nombre: String) {
-        _nombre.value = nombre
-    }
-
-    fun cambiarEmail(email: String) {
-        _email.value = email
-    }
-
-
 
 
 
