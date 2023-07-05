@@ -23,7 +23,7 @@ class MainActivity :  ComponentActivity() {
         )
 
 if(viewModel.cantidadUsuarios()==0) {
-    startActivity(Intent(this@MainActivity, PantallaCrearUsuario::class.java))
+    startActivity(Intent(this@MainActivity, PantallaInicioSinUsuario::class.java))
     finish()
 }else{
     startActivity(Intent(this@MainActivity, PantallaPrincipal::class.java))

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import ar.edu.unlam.mobile2.R
 
 
-class PantallaCrearUsuario : ComponentActivity() {
+class PantallaInicioSinUsuario : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
@@ -47,7 +47,7 @@ class PantallaCrearUsuario : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    startActivity(Intent(this@PantallaCrearUsuario, PantallaPerfilUsuario::class.java))
+                    startActivity(Intent(this@PantallaInicioSinUsuario, PantallaPerfilUsuario::class.java))
                     finish()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Transparent),
