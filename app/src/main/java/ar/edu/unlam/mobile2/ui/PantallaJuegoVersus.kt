@@ -344,7 +344,6 @@ class PantallaJuegoVersus : ComponentActivity() {
                             .clip(CircleShape)
                     )
                 }
-                //-------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.padding(start = 20.dp, top = 4.dp)
@@ -353,7 +352,6 @@ class PantallaJuegoVersus : ComponentActivity() {
                     Text(text = nationalityUser, color = Color(0xFF105590), fontSize = 17.sp)
 
                 }
-                //----------------------------------------------------------------------------------------------------------------------------------------------
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.padding(start = 80.dp, end = 8.dp, top = 4.dp)
@@ -361,9 +359,7 @@ class PantallaJuegoVersus : ComponentActivity() {
                     Text(text = "Puntos: $puntos", color = Color(0xFF105590), fontSize = 17.sp)
 
                 }
-                //----------------------------------------------------------------------------------------------------------------------------------------------
             }
-//-------------------------------------------------------------------------------------------------------------------------------------------------------
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
